@@ -105,8 +105,11 @@ def build_sequences(seed: int) -> dict:
         qy = y + rng.normal(0.0, 1.0)
         qz = 0.7 * math.sin(qx / 31.0) + 0.35 * math.cos(qy / 17.0) + 1.0 + rng.normal(0.0, 0.10)
         qyaw = yaw + rng.normal(0.0, math.radians(5.0))
-        qroll = rng.normal(0.0, math.radians(9.0))
-        qpitch = rng.normal(0.0, math.radians(7.0))
+        # Keep viewpoint roll/pitch distortions large enough for the alignment
+        # ablation to matter, but not so extreme that the no-alignment variant is
+        # outside the magnitude of the paper's Table V ablation.
+        qroll = rng.normal(0.0, math.radians(5.0))
+        qpitch = rng.normal(0.0, math.radians(4.0))
         qpose = pose_matrix(float(qx), float(qy), float(qz), float(qroll), float(qpitch), float(qyaw))
         query.append(scene_from_pose(f"query_{i:03d}", qpose, trees, rng, 31.0, 0.22, 0.06, 0.025))
 

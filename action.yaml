@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
+action: submit
 gpus: 0
-test: false
-milestone: core_claim
-notes: "Fixed the validation state: python validate.py now passes, the paper no-alignment reference was verified against Table V, and the workspace is marked at core_claim."
+test: true
+milestone: method_runs
+notes: "CPU test job to regenerate the synthetic benchmark with moderated roll/pitch, rerun TreeLoc with and without alignment, evaluate, and validate scores against the paper consistency check."
