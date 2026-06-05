@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Disjoint 24-query train/test slices; 27 train and 27 test metric values across 3 artifacts. Full TreeLoc has matching threshold success on train/test (R_at_50=SR=1.0) but continuous all-query errors remain non-saturated: TE_all 0.0161 vs 0.0241, RE_all 0.146 vs 0.189. Baseline and no-alignment artifacts separate clearly on both slices."
+notes: "Packaging audit passed: no external pre-existing artifacts or shared paths; download.sh regenerates the tracked synthetic benchmark."
