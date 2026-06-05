@@ -186,7 +186,20 @@ def verify(query: SceneDesc, cand: SceneDesc) -> dict:
     else:
         dz = 0.0
     overlap = len(pairs) / max(1, len(query.centers) + len(cand.centers) - len(pairs))
-    return {"overlap": float(overlap), "translation": [float(t2[0]), float(t2[1]), dz], "yaw": yaw_from_r2(r), "num_matches": len(pairs)}
+    r4 = np.eye(3)
+    r4[:2, :2] = r
+    t4 = np.array([float(t2[0]), float(t2[1]), dz])
+    # Paper Eq. final composition: undo candidate axis alignment, apply the
+    # verified 4-DoF transform, then apply query axis alignment.
+    final_r = cand.align.T @ r4 @ query.align
+    final_t = cand.align.T @ t4
+    return {
+        "overlap": float(overlap),
+        "translation": final_t.tolist(),
+        "yaw": yaw_from_r2(final_r[:2, :2]),
+        "rotation": final_r.tolist(),
+        "num_matches": len(pairs),
+    }
 
 
 def run_treeloc(data: dict, top_tdh: int, top_fine: int, use_alignment: bool, use_dbh: bool) -> dict:

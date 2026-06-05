@@ -99,8 +99,12 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
         true_positive_top += 1
         gt = inv_pose(poses[c]) @ poses[q]
         est = np.eye(4)
-        est[:3, :3] = yaw_matrix(float(pred["estimated_query_to_candidate"]["yaw"]))
-        est[:3, 3] = np.array(pred["estimated_query_to_candidate"]["translation"], dtype=float)
+        pose_est = pred["estimated_query_to_candidate"]
+        if "rotation" in pose_est:
+            est[:3, :3] = np.array(pose_est["rotation"], dtype=float)
+        else:
+            est[:3, :3] = yaw_matrix(float(pose_est["yaw"]))
+        est[:3, 3] = np.array(pose_est["translation"], dtype=float)
         delta = inv_pose(gt) @ est
         te = float(np.linalg.norm(delta[:3, 3]))
         re = rot_angle_deg(delta[:3, :3])

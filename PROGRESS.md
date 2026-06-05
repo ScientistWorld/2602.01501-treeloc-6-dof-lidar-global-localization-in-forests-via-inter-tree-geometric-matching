@@ -5,15 +5,18 @@
 - Implemented a scaled TreeLoc reproduction on tree-inventory scenes: axis-based roll/pitch correction, TDH coarse retrieval, triangle-descriptor fine retrieval, and two-step geometric verification with DBH and base-height checks.
 - Added a deterministic procedural forest benchmark that provides the same input abstraction used after the paper's tree extraction stage.
 - Added a TDH-only baseline and a method-independent evaluator that writes `scoring/scores.json`.
+- First CPU container smoke job completed successfully, so the paper's actual localization algorithm runs end to end.
 
 ## Results
 
-- Pending compute-container smoke job. Local Python lacks NumPy, so execution is deferred to the submitted environment where `environment/setup.sh` installs it.
+- First smoke run before final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.125, SR 0.171, TE 0.048 m, RE 2.58 degrees.
+- The TDH-only baseline had strong top-1 retrieval on this simple synthetic trajectory but no pose-estimation capability, so R@50 and SR were 0. This confirmed the evaluator distinguishes retrieval-only methods from localization methods.
 
 ## Remaining
 
 - Run the CPU smoke job and inspect `scoring/scores.json`.
-- If the method beats the TDH-only baseline with accurate poses, update milestone to `core_claim`.
+- Rerun after composing the final candidate-frame 6-DoF transform from the axis-aligned verification result.
+- If pose success improves enough to support accurate localization, update milestone to `core_claim`.
 - If results are weak, tune the synthetic benchmark noise/occlusion or matching thresholds while preserving the paper's algorithm.
 
 ## Issues
