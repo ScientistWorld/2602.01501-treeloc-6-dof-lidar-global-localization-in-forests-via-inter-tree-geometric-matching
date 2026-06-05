@@ -1,6 +1,5 @@
-# Train/test evaluation split has been run and checked.
-action: done
+action: submit
 gpus: 0
-test: false
+test: true
 milestone: core_claim
-notes: "Packaging audit passed: no external pre-existing artifacts or shared paths; download.sh regenerates the tracked synthetic benchmark."
+notes: "CPU validation job: regenerate dataset and all TreeLoc/baseline artifacts from scratch, run formal plus train/test evaluators, and execute compare/post-reproducer validators."

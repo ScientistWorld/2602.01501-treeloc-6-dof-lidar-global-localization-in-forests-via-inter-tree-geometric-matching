@@ -97,6 +97,8 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
     positive_dist = float(data.get("positive_distance_m", 10.0))
     te_thresh = float(data.get("localization_translation_threshold_m", 0.5))
     re_thresh = float(data.get("localization_rotation_threshold_deg", 5.0))
+    te_miss_penalty = float(data.get("localization_translation_miss_penalty_m", positive_dist))
+    re_miss_penalty = float(data.get("localization_rotation_miss_penalty_deg", 180.0))
 
     labels = [pair_label(poses, p["query"], p["candidate"], positive_dist) for p in result["pair_scores"]]
     scores = [float(p["score"]) for p in result["pair_scores"]]
@@ -105,11 +107,14 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
     loc_success = 0
     true_positive_top = 0
     te_values, re_values = [], []
+    te_all_values, re_all_values = [], []
     for pred in result["predictions"]:
         q, c = pred["query"], pred["candidate"]
         is_positive = pair_label(poses, q, c, positive_dist)
         r_at_1_hits += is_positive
         if not is_positive:
+            te_all_values.append(te_miss_penalty)
+            re_all_values.append(re_miss_penalty)
             continue
         true_positive_top += 1
         gt = matmul4(inv_pose(poses[c]), poses[q])
@@ -126,6 +131,8 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
         delta = matmul4(inv_pose(gt), est)
         te = math.sqrt(sum(delta[i][3] ** 2 for i in range(3)))
         re = rot_angle_deg(rotation_delta(inv_pose(gt), est))
+        te_all_values.append(te)
+        re_all_values.append(re)
         if te <= te_thresh and re <= re_thresh:
             loc_success += 1
             te_values.append(te)
@@ -140,6 +147,8 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
         "SR": loc_success / max(1, true_positive_top),
         "TE_m": sum(te_values) / len(te_values) if te_values else 999.0,
         "RE_deg": sum(re_values) / len(re_values) if re_values else 999.0,
+        "TE_all_m": sum(te_all_values) / len(te_all_values) if te_all_values else te_miss_penalty,
+        "RE_all_deg": sum(re_all_values) / len(re_all_values) if re_all_values else re_miss_penalty,
     }
 
 

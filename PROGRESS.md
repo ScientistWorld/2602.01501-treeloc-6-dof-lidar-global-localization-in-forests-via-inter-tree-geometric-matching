@@ -25,11 +25,13 @@
 - Continuation timestamp audit on 2026-06-05: `method/treeloc.py` and `data/forest_scenes.json` are newer than `scoring/scores.json` and the main result artifact, so the previous core-claim numbers are stale for the revised method. Lightweight validation still passes, but the next CPU job must regenerate scores before `core_claim` can be restored.
 - CPU validation job `d38f1f38-8fc` completed successfully after the fidelity update. Fresh TreeLoc metrics are R@1 0.750, F1 0.629, AUC 0.653, R@50 0.554, SR 0.738, TE 0.119 m, and RE 0.475 deg. The TDH-only auxiliary baseline scored R@50 0.054 and the no-alignment variant scored R@50 0.107, so the geometric verification and axis-alignment pieces materially improve usable localization on the scaled benchmark. `python validate.py --compare` passed inside the container, but `python validate.py --post-reproducer` rejected the remaining primary-metric gap against the paper's Oxford value.
 - Verification fix on 2026-06-05: replaced bulk centroid alignment with matched-triangle-pair SE(2) hypotheses, all vertex permutations, tree-support consensus selection, and post-consensus refinement. CPU job `14bacc84-1a3` validated this version with TreeLoc scoring R@1 1.000, F1 0.629, AUC 0.653, R@50 1.000, SR 1.000, TE 0.020 m, and RE 0.167 deg. `python validate.py --compare` and `python validate.py --post-reproducer` both passed inside the container.
+- Packaging audit on 2026-06-05: fixed `scripts/run.sh` so it no longer depends on ignored `artifacts/` from a previous run. The job script now regenerates `data/forest_scenes.json`, TDH baseline outputs, TreeLoc outputs, no-alignment diagnostic outputs, formal scores, train/test scores, and both validator checks.
+- Formal metric coverage fix on 2026-06-05: `eval/evaluate_treeloc.py` now writes `TE_all_m` and `RE_all_deg`, matching the complete metric set in `scoring/reference.json`. Local `bash scripts/evaluate.sh`, `python validate.py --compare`, and `python validate.py --post-reproducer` pass.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
-- Core claim is restored with current artifacts and scores from job `14bacc84-1a3`.
+- Core claim is restored with current artifacts and scores from job `14bacc84-1a3`; a follow-up CPU job is being submitted to verify the fresh-artifact packaging path.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
 - The current active milestone is `core_claim`.
 
@@ -40,6 +42,7 @@
 - First verifier implementation aligned all matched triangle centroids in one SVD step, which ran but produced too many false transforms. It has been replaced with per-triangle-pair hypotheses followed by tree-support verification, matching the intended geometric verification more closely.
 - The evaluator previously required NumPy even though it only scored JSON artifacts. This is fixed so `scripts/evaluate.sh` works standalone without relying on method/runtime dependencies.
 - The original procedural data generator also required NumPy, which made `scripts/download.sh` fail before container setup. It has been replaced with standard-library matrix math.
+- Before the packaging audit, `scripts/run.sh` assumed previous result artifacts existed even though `artifacts/` is ignored. This is fixed by regenerating artifacts in `scripts/run.sh`.
 
 ## Deviations from Paper
 

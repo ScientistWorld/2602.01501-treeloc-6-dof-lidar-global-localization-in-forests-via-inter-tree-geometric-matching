@@ -31,5 +31,10 @@
 - Auxiliary metrics show the TDH-only baseline remains much weaker on localization (R@50 0.054) and the no-alignment variant drops to R@50 0.196.
 - Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container.
 
+### [2026-06-05 04:34] - core_claim
+- Fixed a packaging issue where `scripts/run.sh` only evaluated pre-existing ignored artifacts; it now regenerates the benchmark and all standard result artifacts before scoring.
+- Added `TE_all_m` and `RE_all_deg` to the main evaluator so `scoring/scores.json` covers every formal metric in `scoring/reference.json`.
+- Local `python validate.py --compare` and `python validate.py --post-reproducer` pass; submitting a CPU validation job to verify the fresh-artifact path inside the container.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.
