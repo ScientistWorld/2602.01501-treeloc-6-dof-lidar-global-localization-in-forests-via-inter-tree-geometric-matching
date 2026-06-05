@@ -31,4 +31,4 @@ action: submit
 gpus: 0
 test: true
 milestone: method_runs
-notes: "CPU rerun after TreeLoc final 6-DoF pose composition fix; regenerate scores and check whether localization success supports the core claim."
+notes: "CPU rerun after replacing centroid-bulk verification with bounded triangle-pair transform hypotheses; regenerate scores and check core-claim localization success."

@@ -150,18 +150,8 @@ def fine_score(a: SceneDesc, b: SceneDesc) -> float:
     return common / denom
 
 
-def verify(query: SceneDesc, cand: SceneDesc) -> dict:
-    src_centroids, dst_centroids = [], []
-    for key in query.triangles.keys() & cand.triangles.keys():
-        for qc, _ in query.triangles[key][:3]:
-            for cc, _ in cand.triangles[key][:3]:
-                src_centroids.append(qc)
-                dst_centroids.append(cc)
-    if len(src_centroids) < 2:
-        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
-
-    rc, tc = se2_align(np.array(src_centroids), np.array(dst_centroids))
-    transformed = (rc @ query.centers.T).T + tc
+def count_support(query: SceneDesc, cand: SceneDesc, r: np.ndarray, t: np.ndarray) -> list[tuple[int, int]]:
+    transformed = (r @ query.centers.T).T + t
     pairs = []
     for qi, p in enumerate(transformed):
         dists = np.linalg.norm(cand.centers - p, axis=1)
@@ -170,6 +160,36 @@ def verify(query: SceneDesc, cand: SceneDesc) -> dict:
         ci = int(np.argmin(dists))
         if dists[ci] <= 0.60 and abs(query.dbh[qi] - cand.dbh[ci]) <= 0.12:
             pairs.append((qi, ci))
+    return pairs
+
+
+def verify(query: SceneDesc, cand: SceneDesc) -> dict:
+    hypotheses = []
+    checked = 0
+    for key in sorted(query.triangles.keys() & cand.triangles.keys()):
+        for _, q_ids in query.triangles[key][:4]:
+            q_pts = query.centers[list(q_ids), :2]
+            for _, c_ids in cand.triangles[key][:4]:
+                c_base = cand.centers[list(c_ids), :2]
+                for perm in itertools.permutations(range(3)):
+                    checked += 1
+                    if checked > 1200:
+                        break
+                    c_pts = c_base[list(perm)]
+                    r0, t0 = se2_align(q_pts, c_pts)
+                    pairs0 = count_support(query, cand, r0, t0)
+                    if len(pairs0) >= 2:
+                        hypotheses.append((len(pairs0), r0, t0, pairs0))
+                if checked > 1200:
+                    break
+            if checked > 1200:
+                break
+        if checked > 1200:
+            break
+    if not hypotheses:
+        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
+
+    _, rc, tc, pairs = max(hypotheses, key=lambda item: item[0])
 
     if len(pairs) >= 2:
         src = query.centers[[p[0] for p in pairs]]

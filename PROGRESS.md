@@ -10,12 +10,12 @@
 ## Results
 
 - First smoke run before final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.125, SR 0.171, TE 0.048 m, RE 2.58 degrees.
+- Second smoke run after final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.357, SR 0.488, TE 0.105 m, RE 0.437 degrees.
 - The TDH-only baseline had strong top-1 retrieval on this simple synthetic trajectory but no pose-estimation capability, so R@50 and SR were 0. This confirmed the evaluator distinguishes retrieval-only methods from localization methods.
 
 ## Remaining
 
-- Run the CPU smoke job and inspect `scoring/scores.json`.
-- Rerun after composing the final candidate-frame 6-DoF transform from the axis-aligned verification result.
+- Rerun after replacing bulk centroid alignment with bounded triangle-pair transform hypotheses and support-based verification.
 - If pose success improves enough to support accurate localization, update milestone to `core_claim`.
 - If results are weak, tune the synthetic benchmark noise/occlusion or matching thresholds while preserving the paper's algorithm.
 
@@ -23,6 +23,7 @@
 
 - The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark.
 - The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
+- First verifier implementation aligned all matched triangle centroids in one SVD step, which ran but produced too many false transforms. It has been replaced with per-triangle-pair hypotheses followed by tree-support verification, matching the intended geometric verification more closely.
 
 ## Deviations from Paper
 
