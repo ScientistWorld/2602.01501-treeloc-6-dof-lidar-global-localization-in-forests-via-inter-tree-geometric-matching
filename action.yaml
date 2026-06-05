@@ -4,5 +4,5 @@
 action: submit
 gpus: 0
 test: true
-milestone: method_runs
-notes: "CPU test job to regenerate the synthetic benchmark with moderated roll/pitch, rerun TreeLoc with and without alignment, evaluate, and validate scores against the paper consistency check."
+milestone: core_claim
+notes: "CPU test job to regenerate the ID-free synthetic benchmark, rerun TDH baseline plus TreeLoc/full ablation, evaluate all artifacts, and validate scores after fidelity fixes."
