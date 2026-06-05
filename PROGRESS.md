@@ -11,13 +11,13 @@
 
 - First smoke run before final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.125, SR 0.171, TE 0.048 m, RE 2.58 degrees.
 - Second smoke run after final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.357, SR 0.488, TE 0.105 m, RE 0.437 degrees.
+- Third smoke run after triangle-pair verification: TreeLoc scored R@1 1.000, F1 0.715, AUC 0.765, R@50 1.000, SR 1.000, TE 0.022 m, RE 0.298 degrees. This reaches `core_claim` on the scaled benchmark.
 - The TDH-only baseline had strong top-1 retrieval on this simple synthetic trajectory but no pose-estimation capability, so R@50 and SR were 0. This confirmed the evaluator distinguishes retrieval-only methods from localization methods.
 
 ## Remaining
 
-- Rerun after replacing bulk centroid alignment with bounded triangle-pair transform hypotheses and support-based verification.
-- If pose success improves enough to support accurate localization, update milestone to `core_claim`.
-- If results are weak, tune the synthetic benchmark noise/occlusion or matching thresholds while preserving the paper's algorithm.
+- Run the alignment ablation and inspect whether the no-alignment variant degrades relative to full TreeLoc.
+- If ablation supports the paper's component claim, update milestone to `secondary_claims`.
 
 ## Issues
 

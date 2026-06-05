@@ -20,4 +20,9 @@ python method/treeloc.py \
   --data data/forest_scenes.json \
   --output artifacts/treeloc_results.json
 
+python method/treeloc.py \
+  --data data/forest_scenes.json \
+  --output artifacts/treeloc_no_alignment_results.json \
+  --no-alignment
+
 bash scripts/evaluate.sh

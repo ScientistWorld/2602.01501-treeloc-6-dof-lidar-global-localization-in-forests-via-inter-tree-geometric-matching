@@ -30,5 +30,5 @@
 action: submit
 gpus: 0
 test: true
-milestone: method_runs
-notes: "CPU rerun after replacing centroid-bulk verification with bounded triangle-pair transform hypotheses; regenerate scores and check core-claim localization success."
+milestone: core_claim
+notes: "CPU run for secondary alignment ablation: run full TreeLoc and no-alignment variant, then write both synthetic_forest_localization and synthetic_alignment_ablation scores."

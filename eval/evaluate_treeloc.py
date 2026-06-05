@@ -132,14 +132,29 @@ def main() -> None:
     parser.add_argument("--output", default="scoring/scores.json")
     args = parser.parse_args()
     data = json.loads(Path(args.data).read_text())
-    experiment = {"results": {}}
+    main_experiment = {"results": {}}
+    ablation_experiment = {"results": {}}
     for item in args.result:
         name, path = item.split(":", 1)
-        experiment["results"][name] = evaluate_one(data, Path(path))
+        metrics = evaluate_one(data, Path(path))
+        if name == "treeloc":
+            main_experiment["results"][name] = metrics
+        if name in {"treeloc", "treeloc_no_alignment"}:
+            ablation_experiment["results"][name] = {
+                "R_at_1": metrics["R_at_1"],
+                "F1": metrics["F1"],
+                "R_at_50": metrics["R_at_50"],
+            }
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps({"experiments": {"synthetic_forest_localization": experiment}}, indent=2))
-    print(json.dumps({"experiments": {"synthetic_forest_localization": experiment}}, indent=2))
+    experiments = {}
+    if main_experiment["results"]:
+        experiments["synthetic_forest_localization"] = main_experiment
+    if len(ablation_experiment["results"]) == 2:
+        experiments["synthetic_alignment_ablation"] = ablation_experiment
+    payload = {"experiments": experiments}
+    out.write_text(json.dumps(payload, indent=2))
+    print(json.dumps(payload, indent=2))
 
 
 if __name__ == "__main__":

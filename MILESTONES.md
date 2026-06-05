@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 <!-- Milestone levels (update "Current" above as you progress):
   none             — just started, no meaningful progress yet
@@ -24,5 +24,10 @@
 - Generated tree-inventory data, ran TreeLoc and a TDH-only baseline, and wrote evaluator scores.
 - Identified that final pose composition needed to include TreeLoc's axis-alignment rotations before claiming the core localization result.
 
+### [2026-06-05 01:15] - core_claim
+- Replaced centroid-bulk verification with bounded triangle-pair transform hypotheses and support-based refinement.
+- TreeLoc reached R@1 1.000, R@50 1.000, SR 1.000, TE 0.022 m, and RE 0.298 degrees on the scaled tree-inventory localization benchmark.
+- The result supports the paper's core claim that inter-tree geometry can retrieve places and estimate accurate poses from compact tree inventories.
+
 ## Stop Justification
-- Not stopped. First compute-container run is pending.
+- Not stopped. Running an additional alignment ablation job.
