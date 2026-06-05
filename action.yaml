@@ -1,8 +1,6 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
-gpus: 0
-test: true
-milestone: method_runs
-notes: "Test patched TreeLoc verifier using matched-triangle SE(2) hypotheses and tree-support consensus; run reproduce plus compare and post-reproducer validation."
+action: done
+milestone: core_claim
+notes: "Job 14bacc84-1a3 passed compare and post-reproducer validation; TreeLoc scored R@50 1.000 and SR 1.000 on the scaled benchmark, far above TDH-only R@50 0.054 and no-alignment R@50 0.196."

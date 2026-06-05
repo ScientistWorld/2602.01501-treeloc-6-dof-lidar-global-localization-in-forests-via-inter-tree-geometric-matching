@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
 
@@ -25,5 +25,11 @@
 - Patched geometric verification to generate SE(2) hypotheses from matched triangle pairs with all vertex permutations, then select and refine the transform by tree-support consensus.
 - Submitting another CPU validation job to test whether the more faithful TreeLoc verification closes the primary localization gap.
 
+### [2026-06-05 04:05] - core_claim
+- CPU validation job `14bacc84-1a3` completed successfully with the triangle-pair consensus verifier.
+- Fresh TreeLoc metrics: R@1 1.000, F1 0.629, AUC 0.653, R@50 1.000, SR 1.000, TE 0.020 m, and RE 0.167 deg.
+- Auxiliary metrics show the TDH-only baseline remains much weaker on localization (R@50 0.054) and the no-alignment variant drops to R@50 0.196.
+- Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container.
+
 ## Stop Justification
-- Not stopped; the post-reproducer validator requires a smaller primary-metric gap, and a verifier fix is pending validation.
+- Stopping at `core_claim`: the actual TreeLoc-style algorithm runs end to end, current artifacts pass the strict validator, and the scaled benchmark supports the central claim that inter-tree geometric matching yields accurate localization beyond retrieval-only matching.
