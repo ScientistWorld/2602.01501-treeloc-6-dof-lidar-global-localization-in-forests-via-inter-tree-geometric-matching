@@ -31,8 +31,26 @@ if [ ! -f data/forest_scenes.json ]; then
 fi
 
 RESULT_ARGS=()
+add_result_arg() {
+  local item="$1"
+  local name
+  local path
+  if [[ "$item" == *:* ]]; then
+    name="${item%%:*}"
+    path="${item#*:}"
+  else
+    path="$item"
+    name="$(basename "$path")"
+    name="${name%.json}"
+    name="${name%_results}"
+  fi
+  RESULT_ARGS+=(--result "${name}:${path}")
+}
+
 if [ "$#" -gt 0 ]; then
-  RESULT_ARGS+=(--result "treeloc:$1")
+  for item in "$@"; do
+    add_result_arg "$item"
+  done
 else
   if [ -f artifacts/treeloc_results.json ]; then
     RESULT_ARGS+=(--result treeloc:artifacts/treeloc_results.json)

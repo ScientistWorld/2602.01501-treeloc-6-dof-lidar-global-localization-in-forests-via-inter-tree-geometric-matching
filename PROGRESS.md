@@ -27,11 +27,12 @@
 - Verification fix on 2026-06-05: replaced bulk centroid alignment with matched-triangle-pair SE(2) hypotheses, all vertex permutations, tree-support consensus selection, and post-consensus refinement. CPU job `14bacc84-1a3` validated this version with TreeLoc scoring R@1 1.000, F1 0.629, AUC 0.653, R@50 1.000, SR 1.000, TE 0.020 m, and RE 0.167 deg. `python validate.py --compare` and `python validate.py --post-reproducer` both passed inside the container.
 - Packaging audit on 2026-06-05: fixed `scripts/run.sh` so it no longer depends on ignored `artifacts/` from a previous run. The job script now regenerates `data/forest_scenes.json`, TDH baseline outputs, TreeLoc outputs, no-alignment diagnostic outputs, formal scores, train/test scores, and both validator checks.
 - Formal metric coverage fix on 2026-06-05: `eval/evaluate_treeloc.py` now writes `TE_all_m` and `RE_all_deg`, matching the complete metric set in `scoring/reference.json`. Local `bash scripts/evaluate.sh`, `python validate.py --compare`, and `python validate.py --post-reproducer` pass.
+- Final verification on 2026-06-05: `scripts/evaluate.sh` and `eval/evaluate_treeloc.py` now score arbitrary named result artifacts, so future methods are evaluated through the same interface as the reproduced method. The current `scoring/scores.json` includes TreeLoc, TDH-only baseline, and no-alignment diagnostic rows, and validation still passes.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
-- Core claim is restored with current artifacts and scores from job `14bacc84-1a3`; a follow-up CPU job is being submitted to verify the fresh-artifact packaging path.
+- Core claim is restored with current artifacts and scores from job `14bacc84-1a3`; final verification did not require another compute run.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
 - The current active milestone is `core_claim`.
 
@@ -43,6 +44,7 @@
 - The evaluator previously required NumPy even though it only scored JSON artifacts. This is fixed so `scripts/evaluate.sh` works standalone without relying on method/runtime dependencies.
 - The original procedural data generator also required NumPy, which made `scripts/download.sh` fail before container setup. It has been replaced with standard-library matrix math.
 - Before the packaging audit, `scripts/run.sh` assumed previous result artifacts existed even though `artifacts/` is ignored. This is fixed by regenerating artifacts in `scripts/run.sh`.
+- Final verification found generated `jobs/` logs and raw `trajectory/` traces tracked in git. They have been removed from tracking and remain ignored as execution artifacts.
 
 ## Deviations from Paper
 

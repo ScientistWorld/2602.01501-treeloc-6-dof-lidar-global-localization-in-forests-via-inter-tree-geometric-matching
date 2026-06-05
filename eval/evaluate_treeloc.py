@@ -160,19 +160,15 @@ def main() -> None:
     parser.add_argument(
         "--aux-output",
         default=None,
-        help="Optional path for metrics of result names that are not part of reference.json.",
+        help="Optional path for a small note; all evaluated method metrics are written to --output.",
     )
     args = parser.parse_args()
     data = json.loads(Path(args.data).read_text())
     main_experiment = {"results": {}}
-    aux_results = {}
     for item in args.result:
         name, path = item.split(":", 1)
         metrics = evaluate_one(data, Path(path))
-        if name == "treeloc":
-            main_experiment["results"][name] = metrics
-        else:
-            aux_results[name] = metrics
+        main_experiment["results"][name] = metrics
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     experiments = {}
@@ -180,10 +176,10 @@ def main() -> None:
         experiments["synthetic_forest_localization"] = main_experiment
     payload = {"experiments": experiments}
     out.write_text(json.dumps(payload, indent=2))
-    if args.aux_output and aux_results:
+    if args.aux_output:
         aux = Path(args.aux_output)
         aux.parent.mkdir(parents=True, exist_ok=True)
-        aux.write_text(json.dumps({"results": aux_results}, indent=2))
+        aux.write_text(json.dumps({"note": "All evaluated methods are written to scoring/scores.json."}, indent=2))
     print(json.dumps(payload, indent=2))
 
 

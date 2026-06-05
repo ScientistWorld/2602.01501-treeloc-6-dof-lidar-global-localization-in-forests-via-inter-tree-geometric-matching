@@ -7,5 +7,5 @@ Tests whether a method can retrieve correct forest scene matches and estimate us
 
 ## Constraint: synthetic_forest_localization
 Tests whether retrieval gains preserve precise pose estimates rather than returning broad or geometrically inconsistent matches.
-- **Metrics**: `TE_m` and `RE_deg` are lower-is-better.
+- **Metrics**: `TE_m`, `RE_deg`, `TE_all_m`, and `RE_all_deg` are lower-is-better.
 - **Run**: `bash scripts/evaluate.sh` after writing result artifacts in the expected format.

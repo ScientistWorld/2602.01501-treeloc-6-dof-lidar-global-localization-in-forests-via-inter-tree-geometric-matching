@@ -1,5 +1,3 @@
-action: submit
-gpus: 0
-test: true
+action: done
 milestone: core_claim
-notes: "CPU validation job: regenerate dataset and all TreeLoc/baseline artifacts from scratch, run formal plus train/test evaluators, and execute compare/post-reproducer validators."
+notes: "Final verification passed; evaluator, scoring, documentation, and workspace hygiene are ready for gym use."

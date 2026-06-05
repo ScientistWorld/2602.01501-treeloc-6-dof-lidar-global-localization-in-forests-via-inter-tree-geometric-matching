@@ -36,5 +36,10 @@
 - Added `TE_all_m` and `RE_all_deg` to the main evaluator so `scoring/scores.json` covers every formal metric in `scoring/reference.json`.
 - Local `python validate.py --compare` and `python validate.py --post-reproducer` pass; submitting a CPU validation job to verify the fresh-artifact path inside the container.
 
+### [2026-06-05 04:35] - core_claim
+- Final verification found the claimed milestone justified: the TreeLoc-style geometric localization method runs end to end and beats the simple TDH-only and no-alignment checks on the scaled benchmark.
+- Fixed the reusable evaluator contract so every submitted result artifact is written into `scoring/scores.json` under its own method key, rather than only scoring the reproduced method formally.
+- Removed generated job logs and raw trajectory traces from git tracking, tightened method-agnostic evaluation documentation, and confirmed `python validate.py --compare` plus `python validate.py --post-reproducer` pass.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.
