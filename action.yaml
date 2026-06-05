@@ -1,8 +1,6 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
-gpus: 0
-test: true
-milestone: method_runs
-notes: "CPU test job to rerun the full TreeLoc reproduction after fixing scores.json to contain only reference-backed methods, with auxiliary baseline metrics written separately."
+action: done
+milestone: core_claim
+notes: "TreeLoc core claim reproduced on the scaled tree-inventory benchmark; container job a7d551e2-f16 completed scripts/reproduce.sh and validate.py --compare successfully."
