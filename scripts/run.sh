@@ -1,18 +1,10 @@
 #!/bin/bash
-# Example job script submitted via the end-of-turn YAML block.
-#
-# This runs inside the compute container with:
-#   - Your workspace mounted at /home/user
-#   - GPU(s) available
-#   - No internet access
-#
-# Make sure all data, code, and dependencies are already in the
-# workspace or baked into the container before submitting.
+# Score all available TreeLoc-format result artifacts on the visible train
+# slice and held-out test slice.
 
-set -e
+set -euo pipefail
 
 cd /home/user
 
-bash scripts/reproduce.sh
-python validate.py --compare
-python validate.py --post-reproducer
+bash scripts/evaluate_train.sh
+bash scripts/evaluate_test.sh

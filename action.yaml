@@ -1,9 +1,8 @@
-# This iteration writes files only — do NOT submit compute jobs.
-# Once you set action to 'done', STOP immediately.
-# Do NOT sleep, poll, or wait. The system reads this file
-# only after your turn ends.
-action: done
+# This iteration runs the train/test evaluation split on saved method artifacts.
+# Once submitted, stop immediately; the system dispatches the job and wakes the
+# agent when it finishes.
+action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Improvements: removed complement-leak between visible train IDs and hidden test IDs; added required metric descriptions; documented runtime caveats. Notes: no score stubs present; bash -n passed for train/test scripts."
+notes: "Run evaluate_train.sh and evaluate_test.sh over all saved TreeLoc-format result artifacts; populate scores_train/test.json."
