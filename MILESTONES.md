@@ -60,4 +60,4 @@
 - Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container, restoring `core_claim`.
 
 ## Stop Justification
-- Reached `core_claim` on the scaled tree-inventory benchmark with the paper/upstream-style TreeLoc descriptor and geometric verification pipeline. Higher milestones would require broader original-dataset coverage.
+- Completed at milestone `core_claim`.
