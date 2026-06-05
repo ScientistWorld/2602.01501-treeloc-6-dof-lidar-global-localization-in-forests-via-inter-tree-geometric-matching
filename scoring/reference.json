@@ -52,6 +52,12 @@
         }
       },
       "results": {
+        "tdh_baseline": {
+          "type": "baseline"
+        },
+        "treeloc_no_alignment": {
+          "type": "baseline"
+        },
         "btc": {
           "type": "baseline",
           "R_at_1": 0.611,
