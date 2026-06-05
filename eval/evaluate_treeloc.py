@@ -130,14 +130,23 @@ def main() -> None:
     parser.add_argument("--data", default="data/forest_scenes.json")
     parser.add_argument("--result", action="append", required=True, help="method_name:path/to/results.json")
     parser.add_argument("--output", default="scoring/scores.json")
+    parser.add_argument(
+        "--aux-output",
+        default=None,
+        help="Optional path for metrics of result names that are not part of reference.json.",
+    )
     args = parser.parse_args()
     data = json.loads(Path(args.data).read_text())
     main_experiment = {"results": {}}
     ablation_experiment = {"results": {}}
+    aux_results = {}
     for item in args.result:
         name, path = item.split(":", 1)
         metrics = evaluate_one(data, Path(path))
-        main_experiment["results"][name] = metrics
+        if name == "treeloc":
+            main_experiment["results"][name] = metrics
+        elif name not in {"treeloc_no_alignment"}:
+            aux_results[name] = metrics
         if name in {"treeloc", "treeloc_no_alignment"}:
             ablation_experiment["results"][name] = {
                 "R_at_1": metrics["R_at_1"],
@@ -153,6 +162,10 @@ def main() -> None:
         experiments["synthetic_alignment_ablation"] = ablation_experiment
     payload = {"experiments": experiments}
     out.write_text(json.dumps(payload, indent=2))
+    if args.aux_output and aux_results:
+        aux = Path(args.aux_output)
+        aux.parent.mkdir(parents=True, exist_ok=True)
+        aux.write_text(json.dumps({"results": aux_results}, indent=2))
     print(json.dumps(payload, indent=2))
 
 

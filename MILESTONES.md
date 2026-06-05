@@ -16,5 +16,9 @@
 - Continuation audit found a real TreeLoc implementation rather than a surrogate: tree-axis alignment, TDH coarse retrieval, 2D triangle hashing, geometric verification, and 6-DoF composition are present.
 - Existing `scores.json` is stale relative to the latest evaluator and ID-free dataset changes, so a CPU test job is required before restoring `core_claim`.
 
+### [2026-06-05 04:05] - method_runs
+- CPU job `c54eee6a-aab` ran the method and regenerated artifacts successfully, but failed validation because auxiliary methods appeared in `scores.json` without matching `reference.json` entries.
+- Patched evaluation so reference-backed scores and auxiliary baseline sanity metrics are written separately.
+
 ## Stop Justification
 - Current continuation milestone is `method_runs` pending a fresh container run of the updated pipeline.

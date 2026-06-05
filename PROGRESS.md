@@ -17,6 +17,7 @@
 - Current audit on 2026-06-05: `scripts/evaluate.sh` now passes through `artifacts/tdh_baseline_results.json` when present, so baseline-only and full reproduction runs are scored by the same method-independent evaluator.
 - Fidelity pass on 2026-06-05: TreeLoc now uses the paper's top-100 TDH candidate default, paper support thresholds of 0.4 m planar distance and 0.2 m DBH difference, robust consensus axis alignment, and RANSAC-style vertical offset estimation. Persistent synthetic tree IDs were removed from generated and tracked benchmark scenes.
 - Continuation audit on 2026-06-05: implementation is not a surrogate, `eval/` remains independent from `method/`, briefing/scoring deliverables are filled, and `python validate.py --compare` passes. `scoring/scores.json` is stale relative to the latest evaluator/data changes, so the next CPU job must regenerate artifacts and scores before `core_claim` is restored.
+- CPU job `c54eee6a-aab` regenerated the ID-free dataset and all artifacts successfully, with TreeLoc scoring R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg. The job failed only because `scores.json` included auxiliary `tdh_baseline` and `treeloc_no_alignment` entries in the main experiment that are not reference methods. The evaluator now writes non-reference sanity metrics to `artifacts/auxiliary_metrics.json` instead.
 
 ## Remaining
 

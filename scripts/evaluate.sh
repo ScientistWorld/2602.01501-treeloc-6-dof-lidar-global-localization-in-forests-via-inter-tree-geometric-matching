@@ -49,4 +49,5 @@ fi
 python eval/evaluate_treeloc.py \
   --data data/forest_scenes.json \
   "${RESULT_ARGS[@]}" \
-  --output scoring/scores.json
+  --output scoring/scores.json \
+  --aux-output artifacts/auxiliary_metrics.json
