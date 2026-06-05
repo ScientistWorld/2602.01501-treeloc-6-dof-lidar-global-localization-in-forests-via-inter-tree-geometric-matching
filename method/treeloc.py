@@ -120,11 +120,70 @@ def triangle_hash(sides: np.ndarray, area: float, delta_l: float = 0.1, rho: int
     return value
 
 
-def triangle_descriptors(centers: np.ndarray, min_side: float = 2.0, max_side: float = 30.0) -> dict:
+def _edge_ordered_simplex(centers: np.ndarray, i: int, j: int, k: int) -> tuple[int, int, int]:
+    """Canonical TreeLoc simplex ordering: start from the longest edge."""
+    pts = centers[:, :2]
+    d_ij = float(np.sum((pts[i] - pts[j]) ** 2))
+    d_jk = float(np.sum((pts[j] - pts[k]) ** 2))
+    d_ki = float(np.sum((pts[k] - pts[i]) ** 2))
+
+    if d_jk >= d_ij and d_jk >= d_ki:
+        a, b, c = j, k, i
+        side_next, side_last = d_ki, d_ij
+    elif d_ki >= d_ij and d_ki >= d_jk:
+        a, b, c = k, i, j
+        side_next, side_last = d_ij, d_jk
+    else:
+        a, b, c = i, j, k
+        side_next, side_last = d_jk, d_ki
+
+    if side_next < side_last:
+        a, b = b, a
+    return (a, b, c)
+
+
+def _knn_simplexes(centers: np.ndarray, knn_k: int, min_side: float, max_side: float) -> set[tuple[int, int, int]]:
+    """Build the nearest-neighbor triangle set used by the public TreeLoc code.
+
+    The paper defines descriptors over tree triples; the released implementation
+    makes that tractable by forming triples from each tree's local KNN
+    neighborhood and deduplicating them after edge-based canonical ordering.
+    """
+    n = len(centers)
+    simplexes: set[tuple[int, int, int]] = set()
+    pts = centers[:, :2]
+    for i in range(n):
+        dists = np.linalg.norm(pts - pts[i], axis=1)
+        neighbors = [
+            int(idx)
+            for idx in np.argsort(dists)
+            if idx != i and min_side <= dists[idx] <= max_side
+        ][:knn_k]
+        for j, k, l in itertools.combinations(neighbors, 3):
+            simplex = _edge_ordered_simplex(centers, j, k, l)
+            simplex_pts = pts[list(simplex)]
+            sides = np.array(
+                [
+                    np.linalg.norm(simplex_pts[0] - simplex_pts[1]),
+                    np.linalg.norm(simplex_pts[1] - simplex_pts[2]),
+                    np.linalg.norm(simplex_pts[0] - simplex_pts[2]),
+                ]
+            )
+            if np.min(sides) >= min_side and np.max(sides) <= max_side:
+                simplexes.add(simplex)
+    return simplexes
+
+
+def triangle_descriptors(
+    centers: np.ndarray,
+    min_side: float = 2.0,
+    max_side: float = 30.0,
+    knn_k: int = 12,
+) -> dict:
     table: dict[int, list[tuple[np.ndarray, tuple[int, int, int]]]] = defaultdict(list)
     if len(centers) < 3:
         return table
-    for i, j, k in itertools.combinations(range(len(centers)), 3):
+    for i, j, k in _knn_simplexes(centers, knn_k=knn_k, min_side=min_side, max_side=max_side):
         pts = centers[[i, j, k], :2]
         sides = np.array(
             [np.linalg.norm(pts[0] - pts[1]), np.linalg.norm(pts[1] - pts[2]), np.linalg.norm(pts[0] - pts[2])]
@@ -203,7 +262,7 @@ def verify(query: SceneDesc, cand: SceneDesc, max_hypotheses: int = 600) -> dict
     # Paper Sec. III-E: first estimate an SE(2) transform from matched
     # triangle centroids, then refine it using nearby tree centers.
     q_centroids, c_centroids = [], []
-    for key in common_keys:
+    for key in sorted(common_keys):
         q_centroid, _ = query.triangles[key][-1]
         c_centroid, _ = cand.triangles[key][-1]
         q_centroids.append(q_centroid)

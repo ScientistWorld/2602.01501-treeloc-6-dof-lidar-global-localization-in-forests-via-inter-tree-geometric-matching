@@ -2,4 +2,4 @@ action: submit
 gpus: 0
 test: true
 milestone: method_runs
-notes: "Regenerate artifacts and scores after switching verification to the paper/upstream centroid-correspondence initial alignment and strict formal artifact validation."
+notes: "Regenerate artifacts and scores after patching TreeLoc triangle descriptors to use upstream-style KNN simplex construction with centroid-correspondence verification."

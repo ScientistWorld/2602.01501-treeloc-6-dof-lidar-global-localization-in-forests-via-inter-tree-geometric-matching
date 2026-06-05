@@ -47,5 +47,11 @@
 - Patched `method/treeloc.py` to estimate the initial SE(2) transform from matched triangle centroids, then refine with tree-center support and base-height vertical offset.
 - The method still executes syntactically and previous validators pass on stale artifacts, but current scores must be regenerated before `core_claim` can be restored.
 
+### [2026-06-05 04:50] - method_runs
+- CPU validation job `ed4315b9-640` regenerated current artifacts for the centroid-correspondence verifier.
+- The implementation ran end to end and beat auxiliary localization checks, but TreeLoc R@50 was 0.589 against the paper reference of 0.970, so `python validate.py --post-reproducer` failed and `core_claim` remains unverified.
+- Patched triangle descriptor generation to match the public TreeLoc KNN simplex construction and edge-based canonical ordering more closely.
+- Submitting a CPU validation job to regenerate artifacts and scores for the KNN-simplex descriptor version.
+
 ## Stop Justification
-- Pending fresh validation after the centroid-verification fidelity patch.
+- Pending fresh validation after the KNN-simplex descriptor fidelity patch.
