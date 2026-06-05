@@ -22,11 +22,13 @@
 - Validation follow-up: the no-alignment variant scored R@50 0.268 on the procedural benchmark, while the paper reports 0.701 on Oxford Stein. The paper transcription is correct, but the synthetic roll/pitch stress setting is not numerically comparable for this ablation, so it is kept in `artifacts/auxiliary_metrics.json` and removed from formal `scores.json`/`reference.json` targets.
 - Continuation audit on 2026-06-05: TreeLoc remains a real implementation of the paper pipeline, not a surrogate. `scripts/evaluate.sh` initially failed in the bare login environment because `eval/evaluate_treeloc.py` depended on NumPy; the evaluator has been rewritten to use only the Python standard library and now runs standalone. `python validate.py --compare` passes with unchanged metrics.
 - Fidelity update on 2026-06-05: compared the reproduction against the public TreeLoc code release and patched the Python method toward the upstream/paper procedure: raw TDH chi-square, overlapping histogram bins, triangle side-plus-area hashing with 0.1 m quantization, integer common-hash fine retrieval, centroid-based planar verification, and support recomputation after refinement. The procedural benchmark generator no longer depends on NumPy, so `scripts/download.sh` works before container setup. Metrics for this revised implementation are pending a CPU validation job.
+- Continuation timestamp audit on 2026-06-05: `method/treeloc.py` and `data/forest_scenes.json` are newer than `scoring/scores.json` and the main result artifact, so the previous core-claim numbers are stale for the revised method. Lightweight validation still passes, but the next CPU job must regenerate scores before `core_claim` can be restored.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
 - Regenerate artifacts and scores inside the container after the fidelity updates; if the revised method does not support `core_claim`, inspect candidate ranking and geometric verification.
+- Await the submitted CPU validation job for the revised method and update `MILESTONES.md` based on the fresh results.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
 - The current active milestone is `method_runs` until the revised implementation is validated by the submitted job.
 
