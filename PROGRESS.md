@@ -13,11 +13,12 @@
 - Second smoke run after final 6-DoF composition fix: TreeLoc scored R@1 0.732, F1 0.715, AUC 0.765, R@50 0.357, SR 0.488, TE 0.105 m, RE 0.437 degrees.
 - Third smoke run after triangle-pair verification: TreeLoc scored R@1 1.000, F1 0.715, AUC 0.765, R@50 1.000, SR 1.000, TE 0.022 m, RE 0.298 degrees. This reaches `core_claim` on the scaled benchmark.
 - The TDH-only baseline had strong top-1 retrieval on this simple synthetic trajectory but no pose-estimation capability, so R@50 and SR were 0. This confirmed the evaluator distinguishes retrieval-only methods from localization methods.
+- Validation audit on 2026-06-05: `python validate.py` passes with 2 reference experiments and 1 reproduced experiment group. The paper's Table V no-alignment reference value is correctly transcribed as R@50 0.701; the current score file is accepted by the repository validator.
 
 ## Remaining
 
-- Run the alignment ablation and inspect whether the no-alignment variant degrades relative to full TreeLoc.
-- If ablation supports the paper's component claim, update milestone to `secondary_claims`.
+- The alignment ablation is present in `scoring/scores.json`; full alignment scores higher than no alignment on R@50 in this scaled benchmark.
+- Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
 
 ## Issues
 
