@@ -5,13 +5,41 @@
       "weight": 1.0,
       "primary_metric": "R_at_50",
       "metrics": {
-        "R_at_1": {"higher_is_better": true, "coefficient": 0.6},
-        "F1": {"higher_is_better": true, "coefficient": 0.4},
-        "AUC": {"higher_is_better": true, "coefficient": 0.4},
-        "R_at_50": {"higher_is_better": true, "coefficient": 1.0},
-        "SR": {"higher_is_better": true, "coefficient": 0.6},
-        "TE_m": {"higher_is_better": false, "coefficient": -0.5},
-        "RE_deg": {"higher_is_better": false, "coefficient": -0.3}
+        "R_at_1": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Fraction of queries whose top retrieved database scene is within the positive-distance neighborhood."
+        },
+        "F1": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Best thresholded pair-classification F1 over all query/database similarity scores."
+        },
+        "AUC": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Average precision for ranking positive query/database pairs above negative pairs."
+        },
+        "R_at_50": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of queries whose top retrieved match also yields a relative pose within the localization thresholds."
+        },
+        "SR": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Pose-estimation success rate conditioned on retrieving a positive top match."
+        },
+        "TE_m": {
+          "higher_is_better": false,
+          "coefficient": -0.5,
+          "description": "Mean translation error in meters over successfully localized top matches."
+        },
+        "RE_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.3,
+          "description": "Mean rotation error in degrees over successfully localized top matches."
+        }
       },
       "results": {
         "btc": {

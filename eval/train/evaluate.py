@@ -24,13 +24,11 @@ QUERY_IDS = {
     "query_010",
     "query_011",
     "query_012",
-    "query_013",
     "query_014",
     "query_015",
     "query_018",
     "query_019",
     "query_020",
-    "query_021",
     "query_022",
     "query_027",
     "query_028",
@@ -38,14 +36,12 @@ QUERY_IDS = {
     "query_030",
     "query_031",
     "query_032",
-    "query_033",
     "query_034",
     "query_035",
     "query_039",
     "query_043",
     "query_047",
     "query_053",
-    "query_055",
 }
 
 
