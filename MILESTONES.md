@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
 
@@ -53,5 +53,11 @@
 - Patched triangle descriptor generation to match the public TreeLoc KNN simplex construction and edge-based canonical ordering more closely.
 - Submitting a CPU validation job to regenerate artifacts and scores for the KNN-simplex descriptor version.
 
+### [2026-06-05 04:56] - core_claim
+- CPU validation job `8db7236c-81e` completed successfully with the KNN-simplex descriptor and centroid-correspondence verifier.
+- Fresh TreeLoc metrics: R@1 0.911, F1 0.637, AUC 0.626, R@50 0.821, SR 0.902, TE 0.042 m, and RE 0.208 deg.
+- Auxiliary checks remain clearly lower on localization: no-alignment TreeLoc R@50 0.143 and TDH-only R@50 0.054.
+- Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container, restoring `core_claim`.
+
 ## Stop Justification
-- Pending fresh validation after the KNN-simplex descriptor fidelity patch.
+- Reached `core_claim` on the scaled tree-inventory benchmark with the paper/upstream-style TreeLoc descriptor and geometric verification pipeline. Higher milestones would require broader original-dataset coverage.

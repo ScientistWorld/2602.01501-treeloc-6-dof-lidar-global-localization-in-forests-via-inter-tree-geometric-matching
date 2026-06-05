@@ -31,19 +31,20 @@
 - Fidelity follow-up on 2026-06-05: a sub-agent audit identified that the formal evaluator was less strict than train/test scoring and that geometric verification used triangle-vertex pose hypotheses rather than the paper/upstream centroid-correspondence first stage. The evaluator now enforces complete predictions and full query/database pair scores, and `method/treeloc.py` now estimates the initial planar transform from matched triangle centroids before tree-center refinement. Current formal scores are stale after this method change; a CPU validation job is being submitted to regenerate them.
 - CPU validation job `ed4315b9-640` regenerated current artifacts after the centroid-correspondence verifier patch. The method runs end to end and remains well above auxiliary localization checks (TreeLoc R@50 0.589 vs no-alignment 0.107 and TDH-only 0.054), but `python validate.py --post-reproducer` rejected the remaining gap to the paper's Oxford R@50 reference, so the milestone stays at `method_runs`.
 - Current fix on 2026-06-05: patched triangle descriptor generation to mirror the public TreeLoc code more closely by using local KNN simplex construction, edge-based canonical ordering, and deterministic common-hash centroid correspondence ordering. A new CPU validation job is being submitted to regenerate scores with this more faithful descriptor stage.
+- CPU validation job `8db7236c-81e` passed after the KNN-simplex descriptor patch. Final formal TreeLoc metrics are R@1 0.911, F1 0.637, AUC 0.626, R@50 0.821, SR 0.902, TE 0.042 m, RE 0.208 deg, TE_all 1.156 m, and RE_all 16.693 deg. Auxiliary no-alignment and TDH-only localization remain much weaker, and both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container. This restores `core_claim`.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
-- Core claim was restored with artifacts and scores from job `14bacc84-1a3`, but later fidelity patches changed the method afterward. A fresh CPU job must regenerate artifacts and scores before `core_claim` can be restored again.
+- Core claim is restored with current artifacts and scores from job `8db7236c-81e`.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
-- The current active milestone is `method_runs` pending fresh validation of the KNN-simplex descriptor and centroid-verification method.
+- The current active milestone is `core_claim`.
 
 ## Issues
 
 - The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark while preserving the paper's descriptor and verification stages.
 - The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
-- A previous verifier used per-triangle vertex hypotheses to improve support, but the paper and public implementation specify an initial SVD from matched triangle centroid correspondences. This has been corrected; the first regenerated scores still fell short of the strict post-reproducer threshold, and KNN simplex construction has been added to close the fidelity gap.
+- A previous verifier used per-triangle vertex hypotheses to improve support, but the paper and public implementation specify an initial SVD from matched triangle centroid correspondences. This has been corrected; the first regenerated scores fell short of the strict post-reproducer threshold, and KNN simplex construction closed the fidelity gap.
 - The evaluator previously required NumPy even though it only scored JSON artifacts. This is fixed so `scripts/evaluate.sh` works standalone without relying on method/runtime dependencies.
 - The original procedural data generator also required NumPy, which made `scripts/download.sh` fail before container setup. It has been replaced with standard-library matrix math.
 - Before the packaging audit, `scripts/run.sh` assumed previous result artifacts existed even though `artifacts/` is ignored. This is fixed by regenerating artifacts in `scripts/run.sh`.
