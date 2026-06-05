@@ -20,6 +20,7 @@
 - CPU job `c54eee6a-aab` regenerated the ID-free dataset and all artifacts successfully, with TreeLoc scoring R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg. The job failed only because `scores.json` included auxiliary `tdh_baseline` and `treeloc_no_alignment` entries in the main experiment that are not reference methods. The evaluator now writes non-reference sanity metrics to `artifacts/auxiliary_metrics.json` instead.
 - CPU job `a7d551e2-f16` reran `scripts/reproduce.sh` and `python validate.py --compare` successfully after the evaluator contract fix. Final reproduced TreeLoc metrics are R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg.
 - Validation follow-up: the no-alignment variant scored R@50 0.268 on the procedural benchmark, while the paper reports 0.701 on Oxford Stein. The paper transcription is correct, but the synthetic roll/pitch stress setting is not numerically comparable for this ablation, so it is kept in `artifacts/auxiliary_metrics.json` and removed from formal `scores.json`/`reference.json` targets.
+- Continuation audit on 2026-06-05: TreeLoc remains a real implementation of the paper pipeline, not a surrogate. `scripts/evaluate.sh` initially failed in the bare login environment because `eval/evaluate_treeloc.py` depended on NumPy; the evaluator has been rewritten to use only the Python standard library and now runs standalone. `python validate.py --compare` passes with unchanged metrics.
 
 ## Remaining
 
@@ -32,6 +33,7 @@
 - The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark while preserving the paper's descriptor and verification stages.
 - The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
 - First verifier implementation aligned all matched triangle centroids in one SVD step, which ran but produced too many false transforms. It has been replaced with per-triangle-pair hypotheses followed by tree-support verification, matching the intended geometric verification more closely.
+- The evaluator previously required NumPy even though it only scored JSON artifacts. This is fixed so `scripts/evaluate.sh` works standalone without relying on method/runtime dependencies.
 
 ## Deviations from Paper
 

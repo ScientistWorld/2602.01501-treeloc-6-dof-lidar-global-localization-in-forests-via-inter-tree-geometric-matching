@@ -8,32 +8,43 @@ import json
 import math
 from pathlib import Path
 
-import numpy as np
+Matrix4 = list[list[float]]
+Matrix3 = list[list[float]]
 
 
-def inv_pose(t: np.ndarray) -> np.ndarray:
-    out = np.eye(4)
-    out[:3, :3] = t[:3, :3].T
-    out[:3, 3] = -out[:3, :3] @ t[:3, 3]
+def inv_pose(t: Matrix4) -> Matrix4:
+    r_t = [[t[j][i] for j in range(3)] for i in range(3)]
+    trans = [t[i][3] for i in range(3)]
+    out = eye4()
+    for i in range(3):
+        for j in range(3):
+            out[i][j] = r_t[i][j]
+        out[i][3] = -sum(r_t[i][j] * trans[j] for j in range(3))
     return out
 
 
-def yaw_matrix(yaw: float) -> np.ndarray:
+def eye4() -> Matrix4:
+    return [[1.0 if i == j else 0.0 for j in range(4)] for i in range(4)]
+
+
+def matmul4(a: Matrix4, b: Matrix4) -> Matrix4:
+    return [[sum(a[i][k] * b[k][j] for k in range(4)) for j in range(4)] for i in range(4)]
+
+
+def yaw_matrix(yaw: float) -> Matrix3:
     c, s = math.cos(yaw), math.sin(yaw)
-    r = np.eye(3)
-    r[:2, :2] = [[c, -s], [s, c]]
-    return r
+    return [[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]]
 
 
-def rot_angle_deg(r: np.ndarray) -> float:
-    value = max(-1.0, min(1.0, (np.trace(r) - 1.0) / 2.0))
+def rot_angle_deg(r: Matrix3) -> float:
+    value = max(-1.0, min(1.0, (sum(r[i][i] for i in range(3)) - 1.0) / 2.0))
     return math.degrees(math.acos(value))
 
 
 def average_precision(labels: list[int], scores: list[float]) -> float:
-    order = np.argsort(-np.array(scores))
-    labels_sorted = np.array(labels)[order]
-    positives = int(labels_sorted.sum())
+    order = sorted(range(len(scores)), key=lambda i: -scores[i])
+    labels_sorted = [labels[i] for i in order]
+    positives = sum(labels_sorted)
     if positives == 0:
         return 0.0
     tp = 0
@@ -42,13 +53,13 @@ def average_precision(labels: list[int], scores: list[float]) -> float:
         if label:
             tp += 1
             precisions.append(tp / i)
-    return float(np.mean(precisions))
+    return sum(precisions) / len(precisions)
 
 
 def max_f1(labels: list[int], scores: list[float]) -> float:
-    order = np.argsort(-np.array(scores))
-    labels_sorted = np.array(labels)[order]
-    positives = int(labels_sorted.sum())
+    order = sorted(range(len(scores)), key=lambda i: -scores[i])
+    labels_sorted = [labels[i] for i in order]
+    positives = sum(labels_sorted)
     if positives == 0:
         return 0.0
     tp = fp = 0
@@ -64,16 +75,20 @@ def max_f1(labels: list[int], scores: list[float]) -> float:
     return float(best)
 
 
-def load_poses(data: dict) -> dict[str, np.ndarray]:
+def load_poses(data: dict) -> dict[str, Matrix4]:
     poses = {}
     for split in ("query", "database"):
         for scene in data[split]:
-            poses[scene["name"]] = np.array(scene["pose"], dtype=float)
+            poses[scene["name"]] = [[float(v) for v in row] for row in scene["pose"]]
     return poses
 
 
-def pair_label(poses: dict[str, np.ndarray], q: str, c: str, threshold: float) -> int:
-    return int(np.linalg.norm(poses[q][:3, 3] - poses[c][:3, 3]) <= threshold)
+def pair_label(poses: dict[str, Matrix4], q: str, c: str, threshold: float) -> int:
+    return int(math.dist([poses[q][i][3] for i in range(3)], [poses[c][i][3] for i in range(3)]) <= threshold)
+
+
+def rotation_delta(a: Matrix4, b: Matrix4) -> Matrix3:
+    return [[sum(a[i][k] * b[k][j] for k in range(3)) for j in range(3)] for i in range(3)]
 
 
 def evaluate_one(data: dict, result_path: Path) -> dict:
@@ -97,17 +112,20 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
         if not is_positive:
             continue
         true_positive_top += 1
-        gt = inv_pose(poses[c]) @ poses[q]
-        est = np.eye(4)
+        gt = matmul4(inv_pose(poses[c]), poses[q])
+        est = eye4()
         pose_est = pred["estimated_query_to_candidate"]
         if "rotation" in pose_est:
-            est[:3, :3] = np.array(pose_est["rotation"], dtype=float)
+            rotation = pose_est["rotation"]
         else:
-            est[:3, :3] = yaw_matrix(float(pose_est["yaw"]))
-        est[:3, 3] = np.array(pose_est["translation"], dtype=float)
-        delta = inv_pose(gt) @ est
-        te = float(np.linalg.norm(delta[:3, 3]))
-        re = rot_angle_deg(delta[:3, :3])
+            rotation = yaw_matrix(float(pose_est["yaw"]))
+        for i in range(3):
+            for j in range(3):
+                est[i][j] = float(rotation[i][j])
+            est[i][3] = float(pose_est["translation"][i])
+        delta = matmul4(inv_pose(gt), est)
+        te = math.sqrt(sum(delta[i][3] ** 2 for i in range(3)))
+        re = rot_angle_deg(rotation_delta(inv_pose(gt), est))
         if te <= te_thresh and re <= re_thresh:
             loc_success += 1
             te_values.append(te)
@@ -120,8 +138,8 @@ def evaluate_one(data: dict, result_path: Path) -> dict:
         "AUC": average_precision(labels, scores),
         "R_at_50": loc_success / n_queries,
         "SR": loc_success / max(1, true_positive_top),
-        "TE_m": float(np.mean(te_values)) if te_values else 999.0,
-        "RE_deg": float(np.mean(re_values)) if re_values else 999.0,
+        "TE_m": sum(te_values) / len(te_values) if te_values else 999.0,
+        "RE_deg": sum(re_values) / len(re_values) if re_values else 999.0,
     }
 
 

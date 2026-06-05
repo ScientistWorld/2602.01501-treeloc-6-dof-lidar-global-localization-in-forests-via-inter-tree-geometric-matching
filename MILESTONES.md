@@ -29,5 +29,10 @@
 - Verified the TreeLoc reproduction with `python validate.py --compare`.
 - Evaluation remains method-independent: `eval/` reads result artifacts and does not import `method/`.
 
+### [2026-06-05 03:42] - core_claim
+- Audited the continued workspace from a reset `method_runs` starting point.
+- Confirmed `method/treeloc.py` implements TreeLoc's axis alignment, TDH retrieval, triangle matching, and geometric verification rather than a surrogate.
+- Fixed `scripts/evaluate.sh` standalone execution by removing the evaluator's NumPy dependency; `bash scripts/evaluate.sh` and `python validate.py --compare` now pass with unchanged reproduced scores.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.

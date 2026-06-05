@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "TreeLoc core claim reproduced on the fixed scaled tree-inventory benchmark; scripts/reproduce.sh and validate.py --compare pass with method-independent scoring."
+notes: "Continuation audit restored core_claim. Fixed standalone evaluator dependency issue; bash scripts/evaluate.sh and python validate.py --compare pass with unchanged TreeLoc scores."
