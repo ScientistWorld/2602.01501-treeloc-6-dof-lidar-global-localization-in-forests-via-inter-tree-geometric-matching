@@ -1,0 +1,42 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "tdh_baseline": "artifacts/tdh_baseline_results.json",
+        "treeloc_no_alignment": "artifacts/treeloc_no_alignment_results.json",
+        "treeloc": "artifacts/treeloc_results.json"
+      },
+      "results": {
+        "tdh_baseline": {
+          "R_at_1": 0.7083333333333334,
+          "F1": 0.5566037735849056,
+          "AUC": 0.588016321816485,
+          "R_at_50": 0.041666666666666664,
+          "SR": 0.058823529411764705,
+          "TE_m": 0.4708429991848907,
+          "RE_deg": 1.9737475692586914
+        },
+        "treeloc_no_alignment": {
+          "R_at_1": 1.0,
+          "F1": 0.599406528189911,
+          "AUC": 0.6050069081370749,
+          "R_at_50": 0.2916666666666667,
+          "SR": 0.2916666666666667,
+          "TE_m": 0.20841966154937702,
+          "RE_deg": 2.416847905583604
+        },
+        "treeloc": {
+          "R_at_1": 1.0,
+          "F1": 0.6214689265536724,
+          "AUC": 0.6545101749205005,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 0.016101497151334538,
+          "RE_deg": 0.14602754357141262
+        }
+      }
+    }
+  }
+}
