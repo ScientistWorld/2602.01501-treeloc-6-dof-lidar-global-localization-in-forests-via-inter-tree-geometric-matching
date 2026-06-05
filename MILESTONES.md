@@ -32,4 +32,4 @@
 - Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container.
 
 ## Stop Justification
-- Stopping at `core_claim`: the actual TreeLoc-style algorithm runs end to end, current artifacts pass the strict validator, and the scaled benchmark supports the central claim that inter-tree geometric matching yields accurate localization beyond retrieval-only matching.
+- Completed at milestone `core_claim`.
