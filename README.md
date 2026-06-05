@@ -126,6 +126,46 @@ For this scaled reproduction, the evaluator reads a fixed tree-inventory dataset
 
 </details>
 
+### Iteration 2: gpt-5.5
+- **Milestone**: `core_claim` | **Status**: done
+- **Working time**: 5m | **GPU**: 0.0h
+- **Jobs**: 6 total (5 completed, 1 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-05 02:58] - core_claim
+- Verified the current workspace with `python validate.py`; scoring and structural checks pass.
+- TreeLoc runs end to end on the scaled procedural tree-inventory benchmark and supports the core localization claim with R@50 1.000 versus the TDH-only baseline's lack of successful localization.
+
+### [2026-06-05 03:20] - core_claim
+- Audited the implementation against the paper's TreeLoc pipeline: axis-based scene alignment, TDH coarse retrieval, 2D triangle fine retrieval, and two-step geometric verification are implemented in `method/treeloc.py`.
+- Updated the evaluator so independent baseline artifacts are included in `scoring/scores.json` when present.
+
+### [2026-06-05 03:45] - method_runs
+- Continuation audit found a real TreeLoc implementation rather than a surrogate: tree-axis alignment, TDH coarse retrieval, 2D triangle hashing, geometric verification, and 6-DoF composition are present.
+- Existing `scores.json` is stale relative to the latest evaluator and ID-free dataset changes, so a CPU test job is required before restoring `core_claim`.
+
+### [2026-06-05 04:05] - method_runs
+- CPU job `c54eee6a-aab` ran the method and regenerated artifacts successfully, but failed validation because auxiliary methods appeared in `scores.json` without matching `reference.json` entries.
+- Patched evaluation so reference-backed scores and auxiliary baseline sanity metrics are written separately.
+
+### [2026-06-05 04:25] - core_claim
+- CPU job `a7d551e2-f16` reran the full reproduction and validator successfully inside the container.
+- TreeLoc reached R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg on the scaled tree-inventory benchmark.
+- The no-alignment diagnostic is retained as auxiliary output rather than a formal scored target because its procedural benchmark magnitude is not comparable to the paper's Oxford Stein ablation.
+
+### [2026-06-05 03:38] - core_claim
+- Verified the TreeLoc reproduction with `python validate.py --compare`.
+- Evaluation remains method-independent: `eval/` reads result artifacts and does not import `method/`.
+
+### [2026-06-05 03:42] - core_claim
+- Audited the continued workspace from a reset `method_runs` starting point.
+- Confirmed `method/treeloc.py` implements TreeLoc's axis alignment, TDH retrieval, triangle matching, and geometric verification rather than a surrogate.
+- Fixed `scripts/evaluate.sh` standalone execution by removing the evaluator's NumPy dependency; `bash scripts/evaluate.sh` and `python validate.py --compare` now pass with unchanged reproduced scores.
+
+</details>
+
 
 ---
 
