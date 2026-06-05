@@ -1,3 +1,5 @@
-action: done
-milestone: core_claim
-notes: "Final verification passed; evaluator, scoring, documentation, and workspace hygiene are ready for gym use."
+action: submit
+gpus: 0
+test: true
+milestone: method_runs
+notes: "Regenerate artifacts and scores after switching verification to the paper/upstream centroid-correspondence initial alignment and strict formal artifact validation."

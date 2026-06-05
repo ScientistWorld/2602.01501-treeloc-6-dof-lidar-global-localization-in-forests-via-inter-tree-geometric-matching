@@ -200,41 +200,33 @@ def verify(query: SceneDesc, cand: SceneDesc, max_hypotheses: int = 600) -> dict
     if not common_keys:
         return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
 
-    # TreeLoc's second verification stage estimates transforms from matched
-    # 2D triangle descriptors and keeps the pose with strongest tree support.
-    # The hash descriptor is invariant to vertex order, so all vertex
-    # permutations are tested for each matched triangle pair.
-    best_r = np.eye(2)
-    best_t = np.zeros(2)
-    best_pairs: list[tuple[int, int]] = []
-    hypotheses = 0
-    keys = sorted(common_keys, key=lambda k: len(query.triangles[k]) * len(cand.triangles[k]))
-    for key in keys:
-        for _, q_idx in query.triangles[key]:
-            q_pts = query.centers[list(q_idx)]
-            for _, c_idx in cand.triangles[key]:
-                for perm in itertools.permutations(c_idx):
-                    c_pts = cand.centers[list(perm)]
-                    r0, t0 = se2_align(q_pts, c_pts)
-                    pairs0 = count_support(query, cand, r0, t0)
-                    if len(pairs0) > len(best_pairs):
-                        best_r, best_t, best_pairs = r0, t0, pairs0
-                    hypotheses += 1
-                    if hypotheses >= max_hypotheses:
-                        break
-                if hypotheses >= max_hypotheses:
-                    break
-            if hypotheses >= max_hypotheses:
-                break
-        if hypotheses >= max_hypotheses:
-            break
+    # Paper Sec. III-E: first estimate an SE(2) transform from matched
+    # triangle centroids, then refine it using nearby tree centers.
+    q_centroids, c_centroids = [], []
+    for key in common_keys:
+        q_centroid, _ = query.triangles[key][-1]
+        c_centroid, _ = cand.triangles[key][-1]
+        q_centroids.append(q_centroid)
+        c_centroids.append(c_centroid)
+    if len(q_centroids) < 2:
+        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
 
-    if len(best_pairs) < 2:
-        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": len(best_pairs)}
+    r_c, t_c = se2_align(np.array(q_centroids), np.array(c_centroids))
+    initial_pairs = count_support(query, cand, r_c, t_c)
+    if len(initial_pairs) < 2:
+        return {
+            "overlap": 0.0,
+            "translation": [0.0, 0.0, 0.0],
+            "yaw": 0.0,
+            "num_matches": len(initial_pairs),
+        }
 
-    src = query.centers[[p[0] for p in best_pairs]]
-    dst = cand.centers[[p[1] for p in best_pairs]]
-    r, t2 = se2_align(src, dst)
+    transformed = (r_c @ query.centers.T).T + t_c
+    src = transformed[[p[0] for p in initial_pairs]]
+    dst = cand.centers[[p[1] for p in initial_pairs]]
+    r_f, t_f = se2_align(src, dst)
+    r = r_f @ r_c
+    t2 = r_f @ t_c + t_f
     pairs = count_support(query, cand, r, t2)
 
     dz = ransac_vertical_offset(query, cand, pairs)

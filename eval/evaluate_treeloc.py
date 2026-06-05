@@ -83,6 +83,47 @@ def load_poses(data: dict) -> dict[str, Matrix4]:
     return poses
 
 
+def validate_complete_artifact(data: dict, result: dict, result_path: Path) -> None:
+    expected_queries = {scene["name"] for scene in data["query"]}
+    expected_candidates = {scene["name"] for scene in data["database"]}
+    predictions = result.get("predictions", [])
+    pair_scores = result.get("pair_scores", [])
+    if not isinstance(predictions, list) or not isinstance(pair_scores, list):
+        raise ValueError(f"{result_path}: expected list-valued predictions and pair_scores")
+
+    prediction_queries = [str(pred.get("query")) for pred in predictions]
+    seen_queries = set(prediction_queries)
+    duplicates = sorted({q for q in prediction_queries if prediction_queries.count(q) > 1})
+    missing = sorted(expected_queries - seen_queries)
+    extra = sorted(seen_queries - expected_queries)
+    if missing or duplicates or extra:
+        raise ValueError(
+            f"{result_path}: predictions must contain exactly one top prediction per query; "
+            f"missing={missing}, duplicates={duplicates}, extra={extra}"
+        )
+
+    pair_candidates_by_query = {query: set() for query in expected_queries}
+    extra_pairs = []
+    for pair in pair_scores:
+        query = str(pair.get("query"))
+        candidate = str(pair.get("candidate"))
+        if query not in expected_queries or candidate not in expected_candidates:
+            extra_pairs.append((query, candidate))
+            continue
+        pair_candidates_by_query[query].add(candidate)
+    incomplete = {
+        query: sorted(expected_candidates - candidates)
+        for query, candidates in pair_candidates_by_query.items()
+        if candidates != expected_candidates
+    }
+    if incomplete or extra_pairs:
+        examples = {query: missing[:5] for query, missing in list(incomplete.items())[:3]}
+        raise ValueError(
+            f"{result_path}: pair_scores must cover every database candidate for every query; "
+            f"missing_examples={examples}, extra_examples={extra_pairs[:5]}"
+        )
+
+
 def pair_label(poses: dict[str, Matrix4], q: str, c: str, threshold: float) -> int:
     return int(math.dist([poses[q][i][3] for i in range(3)], [poses[c][i][3] for i in range(3)]) <= threshold)
 
@@ -93,6 +134,7 @@ def rotation_delta(a: Matrix4, b: Matrix4) -> Matrix3:
 
 def evaluate_one(data: dict, result_path: Path) -> dict:
     result = json.loads(result_path.read_text())
+    validate_complete_artifact(data, result, result_path)
     poses = load_poses(data)
     positive_dist = float(data.get("positive_distance_m", 10.0))
     te_thresh = float(data.get("localization_translation_threshold_m", 0.5))

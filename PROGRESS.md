@@ -28,19 +28,20 @@
 - Packaging audit on 2026-06-05: fixed `scripts/run.sh` so it no longer depends on ignored `artifacts/` from a previous run. The job script now regenerates `data/forest_scenes.json`, TDH baseline outputs, TreeLoc outputs, no-alignment diagnostic outputs, formal scores, train/test scores, and both validator checks.
 - Formal metric coverage fix on 2026-06-05: `eval/evaluate_treeloc.py` now writes `TE_all_m` and `RE_all_deg`, matching the complete metric set in `scoring/reference.json`. Local `bash scripts/evaluate.sh`, `python validate.py --compare`, and `python validate.py --post-reproducer` pass.
 - Final verification on 2026-06-05: `scripts/evaluate.sh` and `eval/evaluate_treeloc.py` now score arbitrary named result artifacts, so future methods are evaluated through the same interface as the reproduced method. The current `scoring/scores.json` includes TreeLoc, TDH-only baseline, and no-alignment diagnostic rows, and validation still passes.
+- Fidelity follow-up on 2026-06-05: a sub-agent audit identified that the formal evaluator was less strict than train/test scoring and that geometric verification used triangle-vertex pose hypotheses rather than the paper/upstream centroid-correspondence first stage. The evaluator now enforces complete predictions and full query/database pair scores, and `method/treeloc.py` now estimates the initial planar transform from matched triangle centroids before tree-center refinement. Current formal scores are stale after this method change; a CPU validation job is being submitted to regenerate them.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
-- Core claim is restored with current artifacts and scores from job `14bacc84-1a3`; final verification did not require another compute run.
+- Core claim was restored with artifacts and scores from job `14bacc84-1a3`, but the centroid-verification fidelity patch changed the method afterward. A fresh CPU job must regenerate artifacts and scores before `core_claim` can be restored again.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
-- The current active milestone is `core_claim`.
+- The current active milestone is `method_runs` pending fresh validation of the patched centroid-verification method.
 
 ## Issues
 
 - The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark while preserving the paper's descriptor and verification stages.
 - The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
-- First verifier implementation aligned all matched triangle centroids in one SVD step, which ran but produced too many false transforms. It has been replaced with per-triangle-pair hypotheses followed by tree-support verification, matching the intended geometric verification more closely.
+- A previous verifier used per-triangle vertex hypotheses to improve support, but the paper and public implementation specify an initial SVD from matched triangle centroid correspondences. This has been corrected; scores are pending regeneration.
 - The evaluator previously required NumPy even though it only scored JSON artifacts. This is fixed so `scripts/evaluate.sh` works standalone without relying on method/runtime dependencies.
 - The original procedural data generator also required NumPy, which made `scripts/download.sh` fail before container setup. It has been replaced with standard-library matrix math.
 - Before the packaging audit, `scripts/run.sh` assumed previous result artifacts existed even though `artifacts/` is ignored. This is fixed by regenerating artifacts in `scripts/run.sh`.

@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: method_runs**
 
 ## Progress Log
 
@@ -41,5 +41,11 @@
 - Fixed the reusable evaluator contract so every submitted result artifact is written into `scoring/scores.json` under its own method key, rather than only scoring the reproduced method formally.
 - Removed generated job logs and raw trajectory traces from git tracking, tightened method-agnostic evaluation documentation, and confirmed `python validate.py --compare` plus `python validate.py --post-reproducer` pass.
 
+### [2026-06-05 04:41] - method_runs
+- Sub-agent fidelity audit found two remaining issues: the formal evaluator did not require complete artifacts, and the verifier used matched triangle vertices instead of the paper/upstream centroid-correspondence initial alignment.
+- Patched `eval/evaluate_treeloc.py` to reject incomplete predictions or pair scores.
+- Patched `method/treeloc.py` to estimate the initial SE(2) transform from matched triangle centroids, then refine with tree-center support and base-height vertical offset.
+- The method still executes syntactically and previous validators pass on stale artifacts, but current scores must be regenerated before `core_claim` can be restored.
+
 ## Stop Justification
-- Completed at milestone `core_claim`.
+- Pending fresh validation after the centroid-verification fidelity patch.
