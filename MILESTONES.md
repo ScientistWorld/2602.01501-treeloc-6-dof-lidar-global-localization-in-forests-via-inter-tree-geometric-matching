@@ -25,5 +25,9 @@
 - TreeLoc reached R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg on the scaled tree-inventory benchmark.
 - The no-alignment diagnostic is retained as auxiliary output rather than a formal scored target because its procedural benchmark magnitude is not comparable to the paper's Oxford Stein ablation.
 
+### [2026-06-05 03:38] - core_claim
+- Verified the TreeLoc reproduction with `python validate.py --compare`.
+- Evaluation remains method-independent: `eval/` reads result artifacts and does not import `method/`.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.

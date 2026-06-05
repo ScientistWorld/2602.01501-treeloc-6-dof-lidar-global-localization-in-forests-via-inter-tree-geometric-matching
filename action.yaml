@@ -2,5 +2,7 @@
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
 action: done
+gpus: 0
+test: false
 milestone: core_claim
-notes: "TreeLoc core localization claim reproduced on the scaled tree-inventory benchmark; formal scoring now excludes the non-comparable no-alignment diagnostic and validates against the paper-consistent core experiment."
+notes: "TreeLoc core claim reproduced on the fixed scaled tree-inventory benchmark; scripts/reproduce.sh and validate.py --compare pass with method-independent scoring."
