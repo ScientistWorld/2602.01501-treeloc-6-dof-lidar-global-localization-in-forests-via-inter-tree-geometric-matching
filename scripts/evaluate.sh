@@ -15,8 +15,8 @@
 # This file is read by the system for automated comparison.
 #
 # Example usage:
-#   ./evaluate.sh <method_and_run_name>                             # evaluate with defaults
-#   ./evaluate.sh <method_and_run_name> checkpoints/epoch_10.pt     # evaluate a specific checkpoint
+#   bash scripts/evaluate.sh
+#   bash scripts/evaluate.sh artifacts/my_results.json
 #
 # Called from run.sh after training, or independently.
 
@@ -31,14 +31,18 @@ if [ ! -f data/forest_scenes.json ]; then
 fi
 
 RESULT_ARGS=()
-if [ -f artifacts/treeloc_results.json ]; then
-  RESULT_ARGS+=(--result treeloc:artifacts/treeloc_results.json)
-fi
-if [ -f artifacts/treeloc_no_alignment_results.json ]; then
-  RESULT_ARGS+=(--result treeloc_no_alignment:artifacts/treeloc_no_alignment_results.json)
-fi
-if [ -f artifacts/tdh_baseline_results.json ]; then
-  RESULT_ARGS+=(--result tdh_baseline:artifacts/tdh_baseline_results.json)
+if [ "$#" -gt 0 ]; then
+  RESULT_ARGS+=(--result "treeloc:$1")
+else
+  if [ -f artifacts/treeloc_results.json ]; then
+    RESULT_ARGS+=(--result treeloc:artifacts/treeloc_results.json)
+  fi
+  if [ -f artifacts/treeloc_no_alignment_results.json ]; then
+    RESULT_ARGS+=(--result treeloc_no_alignment:artifacts/treeloc_no_alignment_results.json)
+  fi
+  if [ -f artifacts/tdh_baseline_results.json ]; then
+    RESULT_ARGS+=(--result tdh_baseline:artifacts/tdh_baseline_results.json)
+  fi
 fi
 
 if [ "${#RESULT_ARGS[@]}" -eq 0 ]; then

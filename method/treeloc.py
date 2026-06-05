@@ -7,7 +7,7 @@ import argparse
 import itertools
 import json
 import math
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -83,7 +83,7 @@ class SceneDesc:
     heights: np.ndarray
     dbh: np.ndarray
     tdh: np.ndarray
-    triangles: dict[tuple[int, int, int], list[tuple[np.ndarray, tuple[int, int, int]]]]
+    triangles: dict[int, list[tuple[np.ndarray, tuple[int, int, int]]]]
 
 
 def tdh_descriptor(centers: np.ndarray, dbh: np.ndarray, use_dbh: bool = True) -> np.ndarray:
@@ -91,31 +91,37 @@ def tdh_descriptor(centers: np.ndarray, dbh: np.ndarray, use_dbh: bool = True) -
     hist = np.zeros((n_spatial, n_dbh), dtype=float)
     if len(centers) == 0:
         return hist.ravel()
+    spatial_bins = [(0.0, 7.0), (5.0, 13.0), (11.0, 19.0), (17.0, 25.0), (23.0, 30.0)]
+    if use_dbh:
+        dbh_step = (0.80 - 0.0) / (n_dbh + 1)
+        dbh_bins = [(i * dbh_step, i * dbh_step + 0.15) for i in range(n_dbh - 1)]
+        dbh_bins.append((dbh_bins[-1][0] + dbh_step, math.inf))
+    else:
+        dbh_bins = [(0.0, math.inf)]
     distances = np.linalg.norm(centers[:, :2], axis=1)
     for dist, diameter in zip(distances, dbh):
-        rbins = {min(n_spatial - 1, max(0, int(dist // 6.0)))}
-        frac = (dist / 6.0) % 1.0
-        if frac < 0.18 and min(rbins) > 0:
-            rbins.add(min(rbins) - 1)
-        if frac > 0.82 and min(rbins) < n_spatial - 1:
-            rbins.add(min(rbins) + 1)
-        if use_dbh:
-            db = min(n_dbh - 1, max(0, int((diameter - 0.10) / ((0.75 - 0.10) / n_dbh))))
-        else:
-            db = 0
+        rbins = [i for i, (lo, hi) in enumerate(spatial_bins) if lo < dist <= hi or (i == 0 and dist == 0.0)]
+        dbins = [i for i, (lo, hi) in enumerate(dbh_bins) if lo < diameter <= hi or (i == 0 and diameter == 0.0)]
         for rb in rbins:
-            hist[rb, db] += 1.0
-    padded = np.pad(hist, ((1, 1), (1, 1)), mode="edge")
+            for db in dbins:
+                hist[rb, db] += 1.0
     smooth = np.zeros_like(hist)
     for i in range(n_spatial):
         for j in range(n_dbh):
-            smooth[i, j] = padded[i : i + 2, j : j + 2].mean()
-    norm = np.linalg.norm(smooth)
-    return (smooth / norm if norm > 0 else smooth).ravel()
+            smooth[i, j] = hist[i : min(i + 2, n_spatial), j : min(j + 2, n_dbh)].sum()
+    return smooth.ravel()
 
 
-def triangle_descriptors(centers: np.ndarray, side_bin: float = 0.45, max_side: float = 38.0) -> dict:
-    table: dict[tuple[int, int, int], list[tuple[np.ndarray, tuple[int, int, int]]]] = defaultdict(list)
+def triangle_hash(sides: np.ndarray, area: float, delta_l: float = 0.1, rho: int = 100007, modulus: int = 50000000) -> int:
+    ell_1, ell_2, ell_3 = (int(round(float(x) / delta_l)) for x in sorted(sides))
+    value = (ell_3 * rho + ell_2) % modulus
+    value = (value * rho + ell_1) % modulus
+    value = (value * rho + int(round(area / delta_l))) % modulus
+    return value
+
+
+def triangle_descriptors(centers: np.ndarray, min_side: float = 2.0, max_side: float = 30.0) -> dict:
+    table: dict[int, list[tuple[np.ndarray, tuple[int, int, int]]]] = defaultdict(list)
     if len(centers) < 3:
         return table
     for i, j, k in itertools.combinations(range(len(centers)), 3):
@@ -123,9 +129,11 @@ def triangle_descriptors(centers: np.ndarray, side_bin: float = 0.45, max_side: 
         sides = np.array(
             [np.linalg.norm(pts[0] - pts[1]), np.linalg.norm(pts[1] - pts[2]), np.linalg.norm(pts[0] - pts[2])]
         )
-        if np.min(sides) < 1.0 or np.max(sides) > max_side:
+        if np.min(sides) < min_side or np.max(sides) > max_side:
             continue
-        key = tuple(int(round(x / side_bin)) for x in sorted(sides))
+        semi = float(np.sum(sides) / 2.0)
+        area = math.sqrt(max(semi * (semi - sides[0]) * (semi - sides[1]) * (semi - sides[2]), 0.0))
+        key = triangle_hash(sides, area)
         table[key].append((pts.mean(axis=0), (i, j, k)))
     return table
 
@@ -151,15 +159,12 @@ def make_scene(raw: dict, use_alignment: bool = True, use_dbh: bool = True) -> S
 
 
 def chi_square(a: np.ndarray, b: np.ndarray) -> float:
-    return float(0.5 * np.sum((a - b) ** 2 / (a + b + 1e-9)))
+    return float(np.sum((a - b) ** 2 / (a + b + 1e-10)))
 
 
 def fine_score(a: SceneDesc, b: SceneDesc) -> float:
-    ca = Counter({k: len(v) for k, v in a.triangles.items()})
-    cb = Counter({k: len(v) for k, v in b.triangles.items()})
-    common = sum(min(ca[k], cb[k]) for k in ca.keys() & cb.keys())
-    denom = math.sqrt(max(1, sum(ca.values())) * max(1, sum(cb.values())))
-    return common / denom
+    cand_keys = set(b.triangles.keys())
+    return float(sum(1 for key in a.triangles.keys() if key in cand_keys))
 
 
 def count_support(query: SceneDesc, cand: SceneDesc, r: np.ndarray, t: np.ndarray) -> list[tuple[int, int]]:
@@ -191,52 +196,24 @@ def ransac_vertical_offset(query: SceneDesc, cand: SceneDesc, pairs: list[tuple[
 
 
 def verify(query: SceneDesc, cand: SceneDesc) -> dict:
-    hypotheses = []
-    checked = 0
     centroid_src = []
     centroid_dst = []
     for key in sorted(query.triangles.keys() & cand.triangles.keys()):
-        for q_centroid, _ in query.triangles[key][:4]:
-            for c_centroid, _ in cand.triangles[key][:4]:
-                centroid_src.append(q_centroid)
-                centroid_dst.append(c_centroid)
-    if len(centroid_src) >= 2:
-        rc, tc = se2_align(np.array(centroid_src), np.array(centroid_dst))
-        pairs = count_support(query, cand, rc, tc)
-        if len(pairs) >= 2:
-            hypotheses.append((len(pairs), rc, tc, pairs))
-
-    for key in sorted(query.triangles.keys() & cand.triangles.keys()):
-        for _, q_ids in query.triangles[key][:4]:
-            q_pts = query.centers[list(q_ids), :2]
-            for _, c_ids in cand.triangles[key][:4]:
-                c_base = cand.centers[list(c_ids), :2]
-                for perm in itertools.permutations(range(3)):
-                    checked += 1
-                    if checked > 1200:
-                        break
-                    c_pts = c_base[list(perm)]
-                    r0, t0 = se2_align(q_pts, c_pts)
-                    pairs0 = count_support(query, cand, r0, t0)
-                    if len(pairs0) >= 2:
-                        hypotheses.append((len(pairs0), r0, t0, pairs0))
-                if checked > 1200:
-                    break
-            if checked > 1200:
-                break
-        if checked > 1200:
-            break
-    if not hypotheses:
+        q_centroid, _ = query.triangles[key][0]
+        c_centroid, _ = cand.triangles[key][0]
+        centroid_src.append(q_centroid)
+        centroid_dst.append(c_centroid)
+    if len(centroid_src) < 2:
         return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
 
-    _, rc, tc, pairs = max(hypotheses, key=lambda item: item[0])
+    rc, tc = se2_align(np.array(centroid_src), np.array(centroid_dst))
+    pairs = count_support(query, cand, rc, tc)
 
     if len(pairs) >= 2:
         src = query.centers[[p[0] for p in pairs]]
         dst = cand.centers[[p[1] for p in pairs]]
-        rf, tf = se2_align((rc @ src.T).T + tc, dst)
-        r = rf @ rc
-        t2 = rf @ tc + tf
+        r, t2 = se2_align(src, dst)
+        pairs = count_support(query, cand, r, t2)
     else:
         r, t2 = rc, tc
 
