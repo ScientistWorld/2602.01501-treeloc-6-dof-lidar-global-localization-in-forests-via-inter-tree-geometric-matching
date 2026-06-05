@@ -39,6 +39,16 @@
           "higher_is_better": false,
           "coefficient": -0.3,
           "description": "Mean rotation error in degrees over successfully localized top matches."
+        },
+        "TE_all_m": {
+          "higher_is_better": false,
+          "coefficient": -0.8,
+          "description": "Mean translation error in meters over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
+        },
+        "RE_all_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.4,
+          "description": "Mean rotation error in degrees over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
         }
       },
       "results": {

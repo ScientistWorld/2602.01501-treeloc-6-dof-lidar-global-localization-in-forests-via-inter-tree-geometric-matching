@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Run evaluate_train.sh and evaluate_test.sh over all saved TreeLoc-format result artifacts; populate scores_train/test.json."
+notes: "Rerun train/test scoring after adding continuous all-query localization error metrics to reduce saturation."
