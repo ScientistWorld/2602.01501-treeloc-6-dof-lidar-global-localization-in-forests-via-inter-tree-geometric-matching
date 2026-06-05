@@ -14,6 +14,8 @@
 - Third smoke run after triangle-pair verification: TreeLoc scored R@1 1.000, F1 0.715, AUC 0.765, R@50 1.000, SR 1.000, TE 0.022 m, RE 0.298 degrees. This reaches `core_claim` on the scaled benchmark.
 - The TDH-only baseline had strong top-1 retrieval on this simple synthetic trajectory but no pose-estimation capability, so R@50 and SR were 0. This confirmed the evaluator distinguishes retrieval-only methods from localization methods.
 - Validation audit on 2026-06-05: `python validate.py` passes with 2 reference experiments and 1 reproduced experiment group. The paper's Table V no-alignment reference value is correctly transcribed as R@50 0.701; the current score file is accepted by the repository validator.
+- Current audit on 2026-06-05: `scripts/evaluate.sh` now passes through `artifacts/tdh_baseline_results.json` when present, so baseline-only and full reproduction runs are scored by the same method-independent evaluator.
+- Fidelity pass on 2026-06-05: TreeLoc now uses the paper's top-100 TDH candidate default, paper support thresholds of 0.4 m planar distance and 0.2 m DBH difference, robust consensus axis alignment, and RANSAC-style vertical offset estimation. Persistent synthetic tree IDs were removed from generated and tracked benchmark scenes.
 
 ## Remaining
 
@@ -22,7 +24,7 @@
 
 ## Issues
 
-- The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark.
+- The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark while preserving the paper's descriptor and verification stages.
 - The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
 - First verifier implementation aligned all matched triangle centroids in one SVD step, which ran but produced too many false transforms. It has been replaced with per-triangle-pair hypotheses followed by tree-support verification, matching the intended geometric verification more closely.
 

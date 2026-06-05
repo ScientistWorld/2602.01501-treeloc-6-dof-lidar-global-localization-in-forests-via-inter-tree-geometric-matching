@@ -137,8 +137,7 @@ def main() -> None:
     for item in args.result:
         name, path = item.split(":", 1)
         metrics = evaluate_one(data, Path(path))
-        if name == "treeloc":
-            main_experiment["results"][name] = metrics
+        main_experiment["results"][name] = metrics
         if name in {"treeloc", "treeloc_no_alignment"}:
             ablation_experiment["results"][name] = {
                 "R_at_1": metrics["R_at_1"],

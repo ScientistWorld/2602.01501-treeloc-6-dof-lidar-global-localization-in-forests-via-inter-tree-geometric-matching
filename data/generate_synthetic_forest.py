@@ -50,7 +50,7 @@ def make_forest(rng: np.random.Generator, n_trees: int = 720) -> list[dict]:
         lean_roll = rng.normal(0.0, math.radians(2.0))
         lean_pitch = rng.normal(0.0, math.radians(2.0))
         axis = rot_y(lean_pitch) @ rot_x(lean_roll) @ np.array([0.0, 0.0, 1.0])
-        trees.append({"id": i, "pos": [float(x), float(y), float(z)], "axis": axis.tolist(), "dbh": dbh})
+        trees.append({"pos": [float(x), float(y), float(z)], "axis": axis.tolist(), "dbh": dbh})
     return trees
 
 
@@ -78,7 +78,6 @@ def scene_from_pose(
         axis_local = axis_local / (np.linalg.norm(axis_local) + 1e-12)
         local_trees.append(
             {
-                "id": int(tree["id"]),
                 "position": noisy_p.tolist(),
                 "axis": axis_local.tolist(),
                 "dbh": float(max(0.05, tree["dbh"] + rng.normal(0.0, dbh_noise))),

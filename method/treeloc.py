@@ -23,7 +23,19 @@ def rotation_align_to_z(axes: np.ndarray) -> np.ndarray:
         return np.eye(3)
     oriented = axes.copy()
     oriented[oriented[:, 2] < 0] *= -1.0
-    a = np.median(oriented, axis=0)
+    # Robust analogue of Eq. (3): choose the dominant stem direction by
+    # RANSAC-style inlier support, then solve the least-squares mean direction
+    # over that consensus set before aligning it to z.
+    best_inliers = np.arange(len(oriented))
+    best_count = -1
+    cos_tol = math.cos(math.radians(6.0))
+    for candidate in oriented:
+        candidate = candidate / (np.linalg.norm(candidate) + 1e-12)
+        support = np.flatnonzero(np.abs(oriented @ candidate) >= cos_tol)
+        if len(support) > best_count:
+            best_count = len(support)
+            best_inliers = support
+    a = np.mean(oriented[best_inliers], axis=0)
     a = a / (np.linalg.norm(a) + 1e-12)
     z = np.array([0.0, 0.0, 1.0])
     v = np.cross(a, z)
@@ -158,14 +170,42 @@ def count_support(query: SceneDesc, cand: SceneDesc, r: np.ndarray, t: np.ndarra
         if len(dists) == 0:
             continue
         ci = int(np.argmin(dists))
-        if dists[ci] <= 0.60 and abs(query.dbh[qi] - cand.dbh[ci]) <= 0.12:
+        if dists[ci] <= 0.40 and abs(query.dbh[qi] - cand.dbh[ci]) <= 0.20:
             pairs.append((qi, ci))
     return pairs
+
+
+def ransac_vertical_offset(query: SceneDesc, cand: SceneDesc, pairs: list[tuple[int, int]]) -> float:
+    if not pairs:
+        return 0.0
+    offsets = np.array([cand.heights[ci] - query.heights[qi] for qi, ci in pairs], dtype=float)
+    best = float(np.median(offsets))
+    best_count = -1
+    for candidate in offsets:
+        count = int(np.sum(np.abs(offsets - candidate) <= 0.20))
+        if count > best_count:
+            best_count = count
+            best = float(candidate)
+    inliers = offsets[np.abs(offsets - best) <= 0.20]
+    return float(np.median(inliers)) if len(inliers) else best
 
 
 def verify(query: SceneDesc, cand: SceneDesc) -> dict:
     hypotheses = []
     checked = 0
+    centroid_src = []
+    centroid_dst = []
+    for key in sorted(query.triangles.keys() & cand.triangles.keys()):
+        for q_centroid, _ in query.triangles[key][:4]:
+            for c_centroid, _ in cand.triangles[key][:4]:
+                centroid_src.append(q_centroid)
+                centroid_dst.append(c_centroid)
+    if len(centroid_src) >= 2:
+        rc, tc = se2_align(np.array(centroid_src), np.array(centroid_dst))
+        pairs = count_support(query, cand, rc, tc)
+        if len(pairs) >= 2:
+            hypotheses.append((len(pairs), rc, tc, pairs))
+
     for key in sorted(query.triangles.keys() & cand.triangles.keys()):
         for _, q_ids in query.triangles[key][:4]:
             q_pts = query.centers[list(q_ids), :2]
@@ -200,11 +240,7 @@ def verify(query: SceneDesc, cand: SceneDesc) -> dict:
     else:
         r, t2 = rc, tc
 
-    if pairs:
-        dz_values = [cand.heights[ci] - query.heights[qi] for qi, ci in pairs]
-        dz = float(np.median(dz_values))
-    else:
-        dz = 0.0
+    dz = ransac_vertical_offset(query, cand, pairs)
     overlap = len(pairs) / max(1, len(query.centers) + len(cand.centers) - len(pairs))
     r4 = np.eye(3)
     r4[:2, :2] = r
@@ -259,7 +295,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", default="data/forest_scenes.json")
     parser.add_argument("--output", default="artifacts/treeloc_results.json")
-    parser.add_argument("--top-tdh", type=int, default=30)
+    parser.add_argument("--top-tdh", type=int, default=100)
     parser.add_argument("--top-fine", type=int, default=10)
     parser.add_argument("--no-alignment", action="store_true")
     parser.add_argument("--no-dbh", action="store_true")

@@ -37,6 +37,9 @@ fi
 if [ -f artifacts/treeloc_no_alignment_results.json ]; then
   RESULT_ARGS+=(--result treeloc_no_alignment:artifacts/treeloc_no_alignment_results.json)
 fi
+if [ -f artifacts/tdh_baseline_results.json ]; then
+  RESULT_ARGS+=(--result tdh_baseline:artifacts/tdh_baseline_results.json)
+fi
 
 if [ "${#RESULT_ARGS[@]}" -eq 0 ]; then
   echo "No result artifacts found. Run scripts/method.sh or scripts/baseline.sh first." >&2
