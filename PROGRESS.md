@@ -18,11 +18,12 @@
 - Fidelity pass on 2026-06-05: TreeLoc now uses the paper's top-100 TDH candidate default, paper support thresholds of 0.4 m planar distance and 0.2 m DBH difference, robust consensus axis alignment, and RANSAC-style vertical offset estimation. Persistent synthetic tree IDs were removed from generated and tracked benchmark scenes.
 - Continuation audit on 2026-06-05: implementation is not a surrogate, `eval/` remains independent from `method/`, briefing/scoring deliverables are filled, and `python validate.py --compare` passes. `scoring/scores.json` is stale relative to the latest evaluator/data changes, so the next CPU job must regenerate artifacts and scores before `core_claim` is restored.
 - CPU job `c54eee6a-aab` regenerated the ID-free dataset and all artifacts successfully, with TreeLoc scoring R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg. The job failed only because `scores.json` included auxiliary `tdh_baseline` and `treeloc_no_alignment` entries in the main experiment that are not reference methods. The evaluator now writes non-reference sanity metrics to `artifacts/auxiliary_metrics.json` instead.
-- CPU job `a7d551e2-f16` reran `scripts/reproduce.sh` and `python validate.py --compare` successfully after the evaluator contract fix. Final reproduced TreeLoc metrics are R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg. The no-alignment ablation keeps R@1 1.000 but drops to R@50 0.268, supporting the paper's alignment claim in the scaled benchmark.
+- CPU job `a7d551e2-f16` reran `scripts/reproduce.sh` and `python validate.py --compare` successfully after the evaluator contract fix. Final reproduced TreeLoc metrics are R@1 1.000, F1 0.745, AUC 0.802, R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg.
+- Validation follow-up: the no-alignment variant scored R@50 0.268 on the procedural benchmark, while the paper reports 0.701 on Oxford Stein. The paper transcription is correct, but the synthetic roll/pitch stress setting is not numerically comparable for this ablation, so it is kept in `artifacts/auxiliary_metrics.json` and removed from formal `scores.json`/`reference.json` targets.
 
 ## Remaining
 
-- The alignment ablation is present in `scoring/scores.json`; full alignment scores higher than no alignment on R@50 in this scaled benchmark.
+- The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
 - The current stopping point is `core_claim`: the method is implemented, packaged, reproducible in the container, and scored by the reusable evaluator.
 

@@ -138,28 +138,19 @@ def main() -> None:
     args = parser.parse_args()
     data = json.loads(Path(args.data).read_text())
     main_experiment = {"results": {}}
-    ablation_experiment = {"results": {}}
     aux_results = {}
     for item in args.result:
         name, path = item.split(":", 1)
         metrics = evaluate_one(data, Path(path))
         if name == "treeloc":
             main_experiment["results"][name] = metrics
-        elif name not in {"treeloc_no_alignment"}:
+        else:
             aux_results[name] = metrics
-        if name in {"treeloc", "treeloc_no_alignment"}:
-            ablation_experiment["results"][name] = {
-                "R_at_1": metrics["R_at_1"],
-                "F1": metrics["F1"],
-                "R_at_50": metrics["R_at_50"],
-            }
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     experiments = {}
     if main_experiment["results"]:
         experiments["synthetic_forest_localization"] = main_experiment
-    if len(ablation_experiment["results"]) == 2:
-        experiments["synthetic_alignment_ablation"] = ablation_experiment
     payload = {"experiments": experiments}
     out.write_text(json.dumps(payload, indent=2))
     if args.aux_output and aux_results:

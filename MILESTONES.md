@@ -22,7 +22,8 @@
 
 ### [2026-06-05 04:25] - core_claim
 - CPU job `a7d551e2-f16` reran the full reproduction and validator successfully inside the container.
-- TreeLoc reached R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg on the scaled tree-inventory benchmark, while the no-alignment ablation dropped to R@50 0.268.
+- TreeLoc reached R@50 1.000, SR 1.000, TE 0.021 m, and RE 0.177 deg on the scaled tree-inventory benchmark.
+- The no-alignment diagnostic is retained as auxiliary output rather than a formal scored target because its procedural benchmark magnitude is not comparable to the paper's Oxford Stein ablation.
 
 ## Stop Justification
 - Core claim is reproduced in a reusable environment: the actual TreeLoc TDH, triangle matching, alignment, and geometric verification pipeline runs end to end and passes the scoring validator.

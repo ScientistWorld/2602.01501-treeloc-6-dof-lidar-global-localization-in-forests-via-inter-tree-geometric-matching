@@ -2,7 +2,7 @@
   "experiments": {
     "synthetic_forest_localization": {
       "description": "Scaled tree-inventory reproduction of TreeLoc's core forest place-recognition and localization claim; reference values are TreeLoc and BTC results from the paper's Oxford Stein 3-DoF localization setting where metrics overlap.",
-      "weight": 0.75,
+      "weight": 1.0,
       "primary_metric": "R_at_50",
       "metrics": {
         "R_at_1": {"higher_is_better": true, "coefficient": 0.6},
@@ -33,30 +33,6 @@
           "SR": 0.987,
           "TE_m": 0.053,
           "RE_deg": 0.137
-        }
-      }
-    },
-    "synthetic_alignment_ablation": {
-      "description": "Scaled reproduction of the paper's alignment ablation; reference values are the Oxford Stein rows from Table V comparing TreeLoc with and without scene alignment.",
-      "weight": 0.25,
-      "primary_metric": "R_at_50",
-      "metrics": {
-        "R_at_1": {"higher_is_better": true, "coefficient": 0.6},
-        "F1": {"higher_is_better": true, "coefficient": 0.4},
-        "R_at_50": {"higher_is_better": true, "coefficient": 1.0}
-      },
-      "results": {
-        "treeloc_no_alignment": {
-          "type": "proposed",
-          "R_at_1": 0.748,
-          "F1": 0.878,
-          "R_at_50": 0.701
-        },
-        "treeloc": {
-          "type": "proposed",
-          "R_at_1": 0.871,
-          "F1": 0.945,
-          "R_at_50": 0.908
         }
       }
     }

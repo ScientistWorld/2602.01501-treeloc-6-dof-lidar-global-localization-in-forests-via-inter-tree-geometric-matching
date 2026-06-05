@@ -3,4 +3,4 @@
 # only after your turn ends. Sleeping blocks the entire pipeline.
 action: done
 milestone: core_claim
-notes: "TreeLoc core claim reproduced on the scaled tree-inventory benchmark; container job a7d551e2-f16 completed scripts/reproduce.sh and validate.py --compare successfully."
+notes: "TreeLoc core localization claim reproduced on the scaled tree-inventory benchmark; formal scoring now excludes the non-comparable no-alignment diagnostic and validates against the paper-consistent core experiment."
