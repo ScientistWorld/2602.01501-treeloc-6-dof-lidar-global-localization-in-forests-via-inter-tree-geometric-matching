@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: true
 milestone: method_runs
-notes: "Continuation audit found stale scores after TreeLoc fidelity edits; rerun scripts/reproduce.sh and validate.py --compare to regenerate current artifacts."
+notes: "Test patched TreeLoc verifier using matched-triangle SE(2) hypotheses and tree-support consensus; run reproduce plus compare and post-reproducer validation."

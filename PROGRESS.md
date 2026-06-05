@@ -23,14 +23,15 @@
 - Continuation audit on 2026-06-05: TreeLoc remains a real implementation of the paper pipeline, not a surrogate. `scripts/evaluate.sh` initially failed in the bare login environment because `eval/evaluate_treeloc.py` depended on NumPy; the evaluator has been rewritten to use only the Python standard library and now runs standalone. `python validate.py --compare` passes with unchanged metrics.
 - Fidelity update on 2026-06-05: compared the reproduction against the public TreeLoc code release and patched the Python method toward the upstream/paper procedure: raw TDH chi-square, overlapping histogram bins, triangle side-plus-area hashing with 0.1 m quantization, integer common-hash fine retrieval, centroid-based planar verification, and support recomputation after refinement. The procedural benchmark generator no longer depends on NumPy, so `scripts/download.sh` works before container setup. Metrics for this revised implementation are pending a CPU validation job.
 - Continuation timestamp audit on 2026-06-05: `method/treeloc.py` and `data/forest_scenes.json` are newer than `scoring/scores.json` and the main result artifact, so the previous core-claim numbers are stale for the revised method. Lightweight validation still passes, but the next CPU job must regenerate scores before `core_claim` can be restored.
+- CPU validation job `d38f1f38-8fc` completed successfully after the fidelity update. Fresh TreeLoc metrics are R@1 0.750, F1 0.629, AUC 0.653, R@50 0.554, SR 0.738, TE 0.119 m, and RE 0.475 deg. The TDH-only auxiliary baseline scored R@50 0.054 and the no-alignment variant scored R@50 0.107, so the geometric verification and axis-alignment pieces materially improve usable localization on the scaled benchmark. `python validate.py --compare` passed inside the container, but `python validate.py --post-reproducer` rejected the remaining primary-metric gap against the paper's Oxford value.
+- Verification fix on 2026-06-05: replaced bulk centroid alignment with matched-triangle-pair SE(2) hypotheses, all vertex permutations, tree-support consensus selection, and post-consensus refinement. This better matches TreeLoc's geometric verification stage and is pending CPU validation.
 
 ## Remaining
 
 - The no-alignment diagnostic is available as auxiliary output, but it is not a formal scored experiment because its magnitude is not comparable to the paper's Oxford Stein ablation.
-- Regenerate artifacts and scores inside the container after the fidelity updates; if the revised method does not support `core_claim`, inspect candidate ranking and geometric verification.
-- Await the submitted CPU validation job for the revised method and update `MILESTONES.md` based on the fresh results.
+- Validate the triangle-pair consensus verifier in the next CPU job; if it still leaves R@50 too far below the paper number, inspect missed positive pairs and candidate ranking.
 - Higher milestones would require broader coverage of the paper's real datasets or additional ablations beyond the current scaled benchmark.
-- The current active milestone is `method_runs` until the revised implementation is validated by the submitted job.
+- The current active milestone is `method_runs` until the post-reproducer check passes or the remaining gap is diagnosed.
 
 ## Issues
 

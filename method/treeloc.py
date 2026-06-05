@@ -195,27 +195,47 @@ def ransac_vertical_offset(query: SceneDesc, cand: SceneDesc, pairs: list[tuple[
     return float(np.median(inliers)) if len(inliers) else best
 
 
-def verify(query: SceneDesc, cand: SceneDesc) -> dict:
-    centroid_src = []
-    centroid_dst = []
-    for key in sorted(query.triangles.keys() & cand.triangles.keys()):
-        q_centroid, _ = query.triangles[key][0]
-        c_centroid, _ = cand.triangles[key][0]
-        centroid_src.append(q_centroid)
-        centroid_dst.append(c_centroid)
-    if len(centroid_src) < 2:
+def verify(query: SceneDesc, cand: SceneDesc, max_hypotheses: int = 600) -> dict:
+    common_keys = query.triangles.keys() & cand.triangles.keys()
+    if not common_keys:
         return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
 
-    rc, tc = se2_align(np.array(centroid_src), np.array(centroid_dst))
-    pairs = count_support(query, cand, rc, tc)
+    # TreeLoc's second verification stage estimates transforms from matched
+    # 2D triangle descriptors and keeps the pose with strongest tree support.
+    # The hash descriptor is invariant to vertex order, so all vertex
+    # permutations are tested for each matched triangle pair.
+    best_r = np.eye(2)
+    best_t = np.zeros(2)
+    best_pairs: list[tuple[int, int]] = []
+    hypotheses = 0
+    keys = sorted(common_keys, key=lambda k: len(query.triangles[k]) * len(cand.triangles[k]))
+    for key in keys:
+        for _, q_idx in query.triangles[key]:
+            q_pts = query.centers[list(q_idx)]
+            for _, c_idx in cand.triangles[key]:
+                for perm in itertools.permutations(c_idx):
+                    c_pts = cand.centers[list(perm)]
+                    r0, t0 = se2_align(q_pts, c_pts)
+                    pairs0 = count_support(query, cand, r0, t0)
+                    if len(pairs0) > len(best_pairs):
+                        best_r, best_t, best_pairs = r0, t0, pairs0
+                    hypotheses += 1
+                    if hypotheses >= max_hypotheses:
+                        break
+                if hypotheses >= max_hypotheses:
+                    break
+            if hypotheses >= max_hypotheses:
+                break
+        if hypotheses >= max_hypotheses:
+            break
 
-    if len(pairs) >= 2:
-        src = query.centers[[p[0] for p in pairs]]
-        dst = cand.centers[[p[1] for p in pairs]]
-        r, t2 = se2_align(src, dst)
-        pairs = count_support(query, cand, r, t2)
-    else:
-        r, t2 = rc, tc
+    if len(best_pairs) < 2:
+        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": len(best_pairs)}
+
+    src = query.centers[[p[0] for p in best_pairs]]
+    dst = cand.centers[[p[1] for p in best_pairs]]
+    r, t2 = se2_align(src, dst)
+    pairs = count_support(query, cand, r, t2)
 
     dz = ransac_vertical_offset(query, cand, pairs)
     overlap = len(pairs) / max(1, len(query.centers) + len(cand.centers) - len(pairs))
