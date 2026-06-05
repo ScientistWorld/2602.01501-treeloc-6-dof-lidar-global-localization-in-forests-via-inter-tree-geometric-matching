@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: method_runs**
 
 ## Progress Log
 
@@ -12,5 +12,9 @@
 - Audited the implementation against the paper's TreeLoc pipeline: axis-based scene alignment, TDH coarse retrieval, 2D triangle fine retrieval, and two-step geometric verification are implemented in `method/treeloc.py`.
 - Updated the evaluator so independent baseline artifacts are included in `scoring/scores.json` when present.
 
+### [2026-06-05 03:45] - method_runs
+- Continuation audit found a real TreeLoc implementation rather than a surrogate: tree-axis alignment, TDH coarse retrieval, 2D triangle hashing, geometric verification, and 6-DoF composition are present.
+- Existing `scores.json` is stale relative to the latest evaluator and ID-free dataset changes, so a CPU test job is required before restoring `core_claim`.
+
 ## Stop Justification
-- Current validated milestone is `core_claim`; higher milestones would require reproducing additional paper settings or real dataset pipelines beyond the scaled tree-inventory benchmark.
+- Current continuation milestone is `method_runs` pending a fresh container run of the updated pipeline.

@@ -16,6 +16,7 @@
 - Validation audit on 2026-06-05: `python validate.py` passes with 2 reference experiments and 1 reproduced experiment group. The paper's Table V no-alignment reference value is correctly transcribed as R@50 0.701; the current score file is accepted by the repository validator.
 - Current audit on 2026-06-05: `scripts/evaluate.sh` now passes through `artifacts/tdh_baseline_results.json` when present, so baseline-only and full reproduction runs are scored by the same method-independent evaluator.
 - Fidelity pass on 2026-06-05: TreeLoc now uses the paper's top-100 TDH candidate default, paper support thresholds of 0.4 m planar distance and 0.2 m DBH difference, robust consensus axis alignment, and RANSAC-style vertical offset estimation. Persistent synthetic tree IDs were removed from generated and tracked benchmark scenes.
+- Continuation audit on 2026-06-05: implementation is not a surrogate, `eval/` remains independent from `method/`, briefing/scoring deliverables are filled, and `python validate.py --compare` passes. `scoring/scores.json` is stale relative to the latest evaluator/data changes, so the next CPU job must regenerate artifacts and scores before `core_claim` is restored.
 
 ## Remaining
 
