@@ -26,4 +26,4 @@
 - The no-alignment diagnostic is retained as auxiliary output rather than a formal scored target because its procedural benchmark magnitude is not comparable to the paper's Oxford Stein ablation.
 
 ## Stop Justification
-- Core claim is reproduced in a reusable environment: the actual TreeLoc TDH, triangle matching, alignment, and geometric verification pipeline runs end to end and passes the scoring validator.
+- Completed at milestone `core_claim`.
