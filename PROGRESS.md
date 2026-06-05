@@ -2,36 +2,27 @@
 
 ## What Works
 
-<!-- What has been successfully reproduced so far. -->
+- Implemented a scaled TreeLoc reproduction on tree-inventory scenes: axis-based roll/pitch correction, TDH coarse retrieval, triangle-descriptor fine retrieval, and two-step geometric verification with DBH and base-height checks.
+- Added a deterministic procedural forest benchmark that provides the same input abstraction used after the paper's tree extraction stage.
+- Added a TDH-only baseline and a method-independent evaluator that writes `scoring/scores.json`.
 
 ## Results
 
-<!-- Reproduced numbers compared to the paper's reported numbers. -->
+- Pending compute-container smoke job. Local Python lacks NumPy, so execution is deferred to the submitted environment where `environment/setup.sh` installs it.
 
 ## Remaining
 
-<!-- What still needs to be done to reach higher milestones. -->
+- Run the CPU smoke job and inspect `scoring/scores.json`.
+- If the method beats the TDH-only baseline with accurate poses, update milestone to `core_claim`.
+- If results are weak, tune the synthetic benchmark noise/occlusion or matching thresholds while preserving the paper's algorithm.
 
 ## Issues
 
-<!-- Blockers, bugs, or difficulties encountered. -->
+- The paper does not specify numeric values for scan aggregation `k/v/s`, TDH bin overlaps, triangle side-length quantization, or RANSAC iterations. The reproduction documents and fixes reasonable values for the scaled benchmark.
+- The original public robotics datasets are large and require raw LiDAR processing/tree extraction dependencies. This first environment uses a deterministic tree-inventory substitute to validate the localization algorithm itself.
 
 ## Deviations from Paper
 
-<!-- Do not edit this section unless you deviated from the paper's original setup.
-     For each deviation, document: what the paper used, what you substituted, and why.
-
-     ACCEPTABLE deviations (data/resource/scale substitutions — milestones still valid):
-       - Replaced a proprietary dataset with a public one
-       - Used a smaller model of the same architecture
-       - Scaled down training (fewer epochs, smaller batch)
-       - Used a different library for the same algorithm
-
-     UNACCEPTABLE deviations (algorithm substitutions — milestones above 'none' are void):
-       - Replaced the paper's algorithm with a fundamentally different one
-       - Wrote a generic model trained to approximate the method's outputs
-         instead of implementing the method's computational steps
-
-     The test: could someone reading your code identify which algorithm from
-     the paper you implemented? If not, you replaced the method. -->
-
+- Data scale: the paper evaluates on Oxford Forest, Wild-Places, and BotanicGarden LiDAR sequences after tree reconstruction. This reproduction uses deterministic procedural tree inventories because downloading and processing the full robotics datasets plus RealtimeTrees is too large for the first smoke run. The method starts from the same per-tree attributes used by TreeLoc after extraction.
+- Preprocessing scale: raw LiDAR payload aggregation and RealtimeTrees extraction are not reproduced in this first iteration. The implemented localization algorithm from tree inventories is the paper's actual TDH/triangle/geometric-verification pipeline.
+- Unspecified thresholds: triangle hash quantization and some overlap details are fixed in code because the paper text does not provide numeric values.

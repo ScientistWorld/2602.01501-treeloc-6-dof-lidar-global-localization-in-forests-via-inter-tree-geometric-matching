@@ -15,7 +15,9 @@
 
 ## Progress Log
 
-<!-- Write your progress here -->
+### [2026-06-05 00:55] - none
+- Read the paper and extracted TreeLoc's core algorithm, metrics, datasets, and reported reference numbers.
+- Implemented the tree-inventory localization pipeline and prepared a CPU smoke job for first execution.
 
 ## Stop Justification
-- Completed at milestone `none`.
+- Not stopped. First compute-container run is pending.

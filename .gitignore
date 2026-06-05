@@ -69,6 +69,7 @@ docker_*.tar.xz
 trajectory/
 .empty_*/
 outputs/
+artifacts/
 logs/
 .venv/
 venv/
@@ -80,6 +81,7 @@ shared/
 
 # Credentials — never commit
 .git-credentials
+.git-shims/
 .env
 .envrc
 .claude/

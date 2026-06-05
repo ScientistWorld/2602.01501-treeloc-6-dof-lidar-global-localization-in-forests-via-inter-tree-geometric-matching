@@ -1,17 +1,13 @@
 # Problem Definition
 
-What problem does this paper address? Write this so that someone with no knowledge of the paper can understand what needs to be solved and how success is measured.
-
-Do NOT describe the paper's method or solution here — only the problem itself. Think about if a future scientist agent try to solve this problem from scratch without knowing what approach the paper took. If you leak the solution, you compromise the benchmark.
-
 ## Research Question
 
-<!-- What problem or challenge does this paper tackle? What gap in existing work does it address? -->
+Estimate global place matches and relative 6-DoF poses for LiDAR traversals in forests. The setting is difficult because forest scans are repetitive, partially occluded, seasonally variable, and often captured where GPS is degraded.
 
 ## Why It Matters
 
-<!-- Why is this problem important? What would a good solution enable? Make it short -->
+Reliable forest localization enables autonomous navigation, repeated ecological monitoring, digital forest inventory maintenance, and multi-session map alignment without storing dense point cloud maps for every traversal.
 
 ## Success Criteria
 
-<!-- What would a successful solution look like? What properties should it have? This is about the goal, not the paper's specific approach. Make it short -->
+A successful system retrieves the correct nearby database place for a query scene, estimates an accurate relative pose for that match, remains robust to viewpoint and temporal changes, and uses compact scene representations suitable for long-term map management.

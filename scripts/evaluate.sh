@@ -26,5 +26,24 @@ cd /home/user
 
 mkdir -p scoring
 
-# TODO: implement evaluation using code in eval/
-# Must write scoring/scores.json at the end
+if [ ! -f data/forest_scenes.json ]; then
+  python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
+fi
+
+RESULT_ARGS=()
+if [ -f artifacts/treeloc_results.json ]; then
+  RESULT_ARGS+=(--result treeloc:artifacts/treeloc_results.json)
+fi
+if [ -f artifacts/tdh_baseline_results.json ]; then
+  RESULT_ARGS+=(--result tdh_baseline:artifacts/tdh_baseline_results.json)
+fi
+
+if [ "${#RESULT_ARGS[@]}" -eq 0 ]; then
+  echo "No result artifacts found. Run scripts/method.sh or scripts/baseline.sh first." >&2
+  exit 1
+fi
+
+python eval/evaluate_treeloc.py \
+  --data data/forest_scenes.json \
+  "${RESULT_ARGS[@]}" \
+  --output scoring/scores.json

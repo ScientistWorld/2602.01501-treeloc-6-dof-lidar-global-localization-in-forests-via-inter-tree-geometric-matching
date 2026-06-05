@@ -10,5 +10,14 @@ set -e
 
 cd /home/user
 
-# TODO: run the paper's method
-# TODO: call scripts/evaluate.sh to score
+mkdir -p artifacts data
+
+if [ ! -f data/forest_scenes.json ]; then
+  python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
+fi
+
+python method/treeloc.py \
+  --data data/forest_scenes.json \
+  --output artifacts/treeloc_results.json
+
+bash scripts/evaluate.sh

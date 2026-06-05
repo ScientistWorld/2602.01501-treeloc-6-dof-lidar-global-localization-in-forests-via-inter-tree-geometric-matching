@@ -18,7 +18,8 @@ set -e
 
 cd /home/user
 
-# TODO: implement full reproduction pipeline
-# e.g.:
-#   bash scripts/baseline.sh
-#   bash scripts/method.sh
+mkdir -p artifacts data
+python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
+python baseline/tdh_baseline.py --data data/forest_scenes.json --output artifacts/tdh_baseline_results.json
+python method/treeloc.py --data data/forest_scenes.json --output artifacts/treeloc_results.json
+bash scripts/evaluate.sh
