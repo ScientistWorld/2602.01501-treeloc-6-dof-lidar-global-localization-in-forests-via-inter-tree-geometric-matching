@@ -1,0 +1,43 @@
+── Scoring ──
+  reference.json — OK (2 experiments, 8 methods)
+  scores.json — OK (1 experiments, 2 methods)
+  scores_train.json — OK (1 experiments, 2 methods)
+  scores_test.json — OK (1 experiments, 2 methods)
+
+── Structure ──
+  import separation — OK (eval/ and data/ do not import from method/)
+  eval reads method outputs — OK (no regen-without-read pattern)
+  gitignored imports — OK (all eval/method/baseline imports resolve to tracked files)
+  eval/train ↔ eval/test independence — OK
+  shared/ references — OK (no shared/ paths in committed code)
+  evaluate_{train,test}.sh rewiring — OK
+  evaluate_{train,test}.sh method defaults — OK (no hardcoded method name)
+  scores_train.json ↔ scores_test.json method keys — OK
+  scores_train.json ↔ scores_test.json value differentiation — OK
+  primary metric train/test differentiation — OK
+  primary metric discriminates methods on train — OK
+
+All checks passed.
+---- --post-design
+── Scoring ──
+  reference.json — OK (2 experiments, 8 methods)
+  scores.json — OK (1 experiments, 2 methods)
+  scores_train.json — OK (1 experiments, 2 methods)
+  scores_test.json — OK (1 experiments, 2 methods)
+  split-mode artifacts — OK (all 6 present)
+  scores ↔ paper consistency — OK (checked scores.json, scores_train.json, scores_test.json)
+
+── Structure ──
+  import separation — OK (eval/ and data/ do not import from method/)
+  eval reads method outputs — OK (no regen-without-read pattern)
+  gitignored imports — OK (all eval/method/baseline imports resolve to tracked files)
+  eval/train ↔ eval/test independence — OK
+  shared/ references — OK (no shared/ paths in committed code)
+  evaluate_{train,test}.sh rewiring — OK
+  evaluate_{train,test}.sh method defaults — OK (no hardcoded method name)
+  scores_train.json ↔ scores_test.json method keys — OK
+  scores_train.json ↔ scores_test.json value differentiation — OK
+  primary metric train/test differentiation — OK
+  primary metric discriminates methods on train — OK
+
+All checks passed.

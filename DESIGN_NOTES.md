@@ -1,3 +1,6 @@
+> **Superseded (iteration 11).** This note describes the earlier synthetic-forest gym. The gym now uses the
+> authors' real tree inventories; see `HARDENING.md`, `briefing/evaluation.md` and `scoring/`.
+
 # Train/Test Evaluation Design Notes
 
 ## Checks and Changes

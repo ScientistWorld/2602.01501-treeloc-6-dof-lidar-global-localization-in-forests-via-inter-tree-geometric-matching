@@ -14,3 +14,7 @@ The paper addresses global localization in forests, where GPS is unreliable and 
 - On Oxford Stein, TreeLoc reports R@1 0.871, F1 0.945, AUC 0.988, and 3-DoF R@50 0.970.
 - In the same localization setting, TreeLoc reports TE 0.053 m and RE 0.137 degrees, outperforming BTC.
 - The global tree database application stores tens of kilobytes per mission, far smaller than raw point clouds or BTC descriptor maps.
+
+## Gym Setup
+
+The gym scores methods on the authors' released tree inventories: intra-session revisits (train Oxford Evo, hidden test Oxford Stein am Rhein) and inter-session revisits ~6 months apart (Wild-Places Venman V-03 against V-02; train outside, hidden test inside the official test regions). The reference reproduction reaches R@50 0.879 / SR 0.934 / TE 0.121 m on Stein against the paper's 6-DoF 0.908 / 0.940 / 0.126 m. See `briefing/evaluation.md` and `HARDENING.md`.

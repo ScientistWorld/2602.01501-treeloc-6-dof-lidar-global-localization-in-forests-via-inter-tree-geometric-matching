@@ -1,0 +1,23 @@
+3.11.15 (main, Mar 16 2026, 23:07:56) [GCC 14.2.0]
+numpy 2.4.6
+8
+treeloc [] on intra_session_localization: 2 s
+treeloc [--no-alignment] on intra_session_localization: 16 s
+treeloc [--no-dbh] on intra_session_localization: 5 s
+treeloc [--first-step-only] on intra_session_localization: 5 s
+treeloc [--top-tdh 0] on intra_session_localization: 4 s
+treeloc [--top-tdh 0 --top-hash 0] on intra_session_localization: 9 s
+treeloc [--seed 1] on intra_session_localization: 8 s
+treeloc_robust [] on intra_session_localization: 49 s
+treeloc_robust [--tilt] on intra_session_localization: 34 s
+smoke output ok: f0af0e7bbb870 -10.534323917890699
+treeloc [] on inter_session_localization: 4 s
+treeloc [--no-alignment] on inter_session_localization: 21 s
+treeloc [--no-dbh] on inter_session_localization: 5 s
+treeloc [--first-step-only] on inter_session_localization: 17 s
+treeloc [--top-tdh 0] on inter_session_localization: 5 s
+treeloc [--top-tdh 0 --top-hash 0] on inter_session_localization: 4 s
+treeloc [--seed 1] on inter_session_localization: 3 s
+treeloc_robust [] on inter_session_localization: 11 s
+treeloc_robust [--tilt] on inter_session_localization: 11 s
+smoke output ok: fe4da65511fbd -16.6011481491501

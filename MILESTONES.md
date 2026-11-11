@@ -59,5 +59,10 @@
 - Auxiliary checks remain clearly lower on localization: no-alignment TreeLoc R@50 0.143 and TDH-only R@50 0.054.
 - Both `python validate.py --compare` and `python validate.py --post-reproducer` passed inside the container, restoring `core_claim`.
 
+### [2026-11-11] - core_claim (iteration 11, hardening)
+- Moved the gym from the synthetic forest to the authors' released tree inventories: train Oxford Evo + Wild-Places Venman outside the test regions, hidden test Oxford Stein + Venman official test regions; the hidden test runs each submission on inputs only `eval/test/` holds.
+- Registered the V-03 inter-session ground truth to V-02 (the released trajectories are ~0.5 m apart), restored the paper's Table V no-alignment ablation, added evaluator file guards, matched the released tree-selection order.
+- Reference on hidden Stein: R@50 0.879, SR 0.934, TE 0.121 m (paper 6-DoF: 0.908 / 0.940 / 0.126 m); stronger variant +2.73 rank, all paper ablations below the reference, all shortcuts at worst values; exhaustive verification still +0.47 (documented in HARDENING.md).
+
 ## Stop Justification
 - Completed at milestone `core_claim`.
