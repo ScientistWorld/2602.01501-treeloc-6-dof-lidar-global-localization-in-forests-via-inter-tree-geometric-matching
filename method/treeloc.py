@@ -1,5 +1,32 @@
 #!/usr/bin/env python3
-"""TreeLoc reproduction on tree-inventory scenes."""
+"""TreeLoc: 6-DoF LiDAR global localization in forests via inter-tree geometric matching.
+
+Re-implementation of Jung et al. (ICRA 2026, arXiv:2602.01501), following the
+paper (Sec. III) and the authors' released C++ implementation
+(github.com/minwoo0611/TreeLoc, ``src/matching.cpp`` / ``src/app.cpp``):
+
+1. Tree selection: reconstructed stems inside a 60 m x 60 m box, topped up to
+   30 trees with candidate stems ranked by detection score.
+2. Roll/pitch correction (Sec. III-B, Eq. 3): RANSAC over the stem axes of
+   reconstructed trees, least-squares mean direction of the consensus set,
+   rotated onto e_z; stem positions are rotated and projected to the plane.
+3. Tree Distribution Histogram (Sec. III-C): 5 radial x 8 DBH bins with
+   overlapping ranges, 2x2 uniform smoothing, chi-square distance; the 100
+   closest database frames are kept.
+4. 2D triangle descriptor (Sec. III-D): triangles from each tree's 10 nearest
+   neighbours, hash of the quantized sorted side lengths (and area, as in the
+   released code); the 10 candidates sharing the most keys are verified.
+5. Two-step geometric verification (Sec. III-E): SE(2) from matched triangle
+   centroids (Eq. 5), DBH-gated nearest-neighbour stem correspondences,
+   second SVD refinement, overlap ratio (Eq. 6) ranks candidates; vertical
+   offset from base heights by RANSAC; the 4-DoF transform is composed with
+   both scenes' axis-alignment rotations into a 6-DoF pose.
+
+Interface (gym): ``python method/treeloc.py --input in.json --output out.json``.
+The output holds, per query, the best database frame, the overlap ratio as its
+score, and the estimated transform mapping query-frame points into the
+candidate frame.
+"""
 
 from __future__ import annotations
 
@@ -7,354 +34,325 @@ import argparse
 import itertools
 import json
 import math
-from collections import defaultdict
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
 
-
-def skew(v: np.ndarray) -> np.ndarray:
-    return np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]], dtype=float)
-
-
-def rotation_align_to_z(axes: np.ndarray) -> np.ndarray:
-    if len(axes) == 0:
-        return np.eye(3)
-    oriented = axes.copy()
-    oriented[oriented[:, 2] < 0] *= -1.0
-    # Robust analogue of Eq. (3): choose the dominant stem direction by
-    # RANSAC-style inlier support, then solve the least-squares mean direction
-    # over that consensus set before aligning it to z.
-    best_inliers = np.arange(len(oriented))
-    best_count = -1
-    cos_tol = math.cos(math.radians(6.0))
-    for candidate in oriented:
-        candidate = candidate / (np.linalg.norm(candidate) + 1e-12)
-        support = np.flatnonzero(np.abs(oriented @ candidate) >= cos_tol)
-        if len(support) > best_count:
-            best_count = len(support)
-            best_inliers = support
-    a = np.mean(oriented[best_inliers], axis=0)
-    a = a / (np.linalg.norm(a) + 1e-12)
-    z = np.array([0.0, 0.0, 1.0])
-    v = np.cross(a, z)
-    s = np.linalg.norm(v)
-    c = float(np.dot(a, z))
-    if s < 1e-10:
-        return np.eye(3)
-    k = skew(v / s)
-    return np.eye(3) + k * s + (k @ k) * (1.0 - c)
+BOX_HALF_WIDTH_M = 30.0
+TARGET_TREES = 30
+SUPPLEMENT_SCORE_MIN = 0.1
+SPATIAL_BINS = [(0.0, 7.0), (5.0, 13.0), (11.0, 19.0), (17.0, 25.0), (23.0, 30.0)]
+DBH_MIN, DBH_MAX, DBH_SECTIONS, DBH_BIN_WIDTH = 0.0, 0.8, 8, 0.15
+KNN_K = 10
+MIN_EDGE_M, MAX_EDGE_M = 2.0, 30.0
+DELTA_L = 0.1
+HASH_RHO, HASH_MOD = 100007, 50000000
+AXIS_RANSAC_TOL_DEG = 10.0
+INIT_MATCH_DIST_M, INIT_MATCH_DBH_M = 0.5, 0.4
+FINAL_MATCH_DIST_M = 0.4
+Z_RANSAC_ITERS, Z_RANSAC_SAMPLE, Z_INLIER_M, Z_MIN_INLIER_RATIO = 200, 10, 0.1, 0.9
 
 
-def se2_align(src: np.ndarray, dst: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    if len(src) == 0:
-        return np.eye(2), np.zeros(2)
-    src_mean = src.mean(axis=0)
-    dst_mean = dst.mean(axis=0)
-    xs = src - src_mean
-    xd = dst - dst_mean
-    u, _, vt = np.linalg.svd(xs.T @ xd)
-    r = vt.T @ u.T
-    if np.linalg.det(r) < 0:
-        vt[-1] *= -1
-        r = vt.T @ u.T
-    t = dst_mean - r @ src_mean
-    return r, t
+def dbh_bins() -> list[tuple[float, float]]:
+    step = (DBH_MAX - DBH_MIN) / (DBH_SECTIONS + 1)
+    bins = [(DBH_MIN + i * step, DBH_MIN + i * step + DBH_BIN_WIDTH) for i in range(DBH_SECTIONS - 1)]
+    bins.append((bins[-1][0] + step, math.inf))
+    return bins
 
 
-def yaw_from_r2(r: np.ndarray) -> float:
-    return math.atan2(r[1, 0], r[0, 0])
-
-
-def pose_inv(t: np.ndarray) -> np.ndarray:
-    out = np.eye(4)
-    out[:3, :3] = t[:3, :3].T
-    out[:3, 3] = -out[:3, :3] @ t[:3, 3]
-    return out
+DBH_BINS = dbh_bins()
 
 
 @dataclass
-class SceneDesc:
-    name: str
-    pose: np.ndarray
-    align: np.ndarray
-    centers: np.ndarray
-    heights: np.ndarray
-    dbh: np.ndarray
-    tdh: np.ndarray
-    triangles: dict[int, list[tuple[np.ndarray, tuple[int, int, int]]]]
+class Scene:
+    id: str
+    align: np.ndarray  # 3x3 rotation taking raw local coordinates to the gravity-aligned frame
+    centers: np.ndarray  # (n, 2) aligned stem centres of selected trees
+    heights: np.ndarray  # (n,) aligned base heights
+    dbh: np.ndarray  # (n,)
+    tdh: np.ndarray  # (40,)
+    hash_list: list[int] = field(default_factory=list)  # one hash per triangle (with repeats)
+    hash_last: dict[int, tuple[int, int, int]] = field(default_factory=dict)  # hash -> last triangle
+    hash_counter: Counter = field(default_factory=Counter)
+    hash_set: frozenset = frozenset()
+
+
+# ----------------------------------------------------------------------------- preprocessing
+
+
+def rotation_onto_z(a: np.ndarray) -> np.ndarray:
+    a = a / (np.linalg.norm(a) + 1e-12)
+    z = np.array([0.0, 0.0, 1.0])
+    c = float(np.clip(a @ z, -1.0, 1.0))
+    if abs(c - 1.0) < 1e-12:
+        return np.eye(3)
+    if abs(c + 1.0) < 1e-12:
+        return np.diag([-1.0, 1.0, -1.0])
+    v = np.cross(a, z)
+    vx = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+    return np.eye(3) + vx + vx @ vx / (1.0 + c)
+
+
+def axis_alignment(axes: np.ndarray) -> np.ndarray:
+    """RANSAC + least-squares solution of Eq. (3): align the dominant stem direction with e_z."""
+    if len(axes) == 0:
+        return np.eye(3)
+    a = axes / (np.linalg.norm(axes, axis=1, keepdims=True) + 1e-12)
+    a = np.where(a[:, 2:3] < 0.0, -a, a)  # |e_z^T R a| is sign-invariant
+    cos_tol = math.cos(math.radians(AXIS_RANSAC_TOL_DEG))
+    support = np.abs(a @ a.T) >= cos_tol  # hypothesis = each observed axis
+    counts = support.sum(axis=1)
+    best = int(np.argmax(counts))
+    inliers = a[support[best]]
+    mean = inliers.mean(axis=0)
+    return rotation_onto_z(mean)
+
+
+def select_trees(trees: np.ndarray, f: dict) -> np.ndarray:
+    """Upstream SelectTreesForDescriptors: reconstructed stems, then candidate stems by score."""
+    rec = trees[:, f["reconstructed"]] == 1
+    nclu = trees[:, f["number_clusters"]]
+    score = trees[:, f["score"]]
+    chosen = list(np.flatnonzero(rec))
+    if len(chosen) < TARGET_TREES:
+        cand = np.flatnonzero(~rec & (nclu > 2) & (score > SUPPLEMENT_SCORE_MIN))
+        cand = cand[np.argsort(-score[cand], kind="stable")]
+        chosen += list(cand[: TARGET_TREES - len(chosen)])
+    if len(chosen) < TARGET_TREES:
+        cand = np.flatnonzero(~rec & (nclu == 2) & (score > SUPPLEMENT_SCORE_MIN))
+        cand = cand[np.argsort(-score[cand], kind="stable")]
+        chosen += list(cand[: TARGET_TREES - len(chosen)])
+    return np.array(chosen, dtype=int)
 
 
 def tdh_descriptor(centers: np.ndarray, dbh: np.ndarray, use_dbh: bool = True) -> np.ndarray:
-    n_spatial, n_dbh = 5, 8
-    hist = np.zeros((n_spatial, n_dbh), dtype=float)
-    if len(centers) == 0:
-        return hist.ravel()
-    spatial_bins = [(0.0, 7.0), (5.0, 13.0), (11.0, 19.0), (17.0, 25.0), (23.0, 30.0)]
-    if use_dbh:
-        dbh_step = (0.80 - 0.0) / (n_dbh + 1)
-        dbh_bins = [(i * dbh_step, i * dbh_step + 0.15) for i in range(n_dbh - 1)]
-        dbh_bins.append((dbh_bins[-1][0] + dbh_step, math.inf))
-    else:
-        dbh_bins = [(0.0, math.inf)]
-    distances = np.linalg.norm(centers[:, :2], axis=1)
-    for dist, diameter in zip(distances, dbh):
-        rbins = [i for i, (lo, hi) in enumerate(spatial_bins) if lo < dist <= hi or (i == 0 and dist == 0.0)]
-        dbins = [i for i, (lo, hi) in enumerate(dbh_bins) if lo < diameter <= hi or (i == 0 and diameter == 0.0)]
-        for rb in rbins:
-            for db in dbins:
-                hist[rb, db] += 1.0
+    bins_d = DBH_BINS if use_dbh else [(-math.inf, math.inf)]
+    hist = np.zeros((len(SPATIAL_BINS), len(bins_d)))
+    for (x, y), d in zip(centers, dbh):
+        r = math.hypot(x, y)
+        si = next((i for i, (lo, hi) in enumerate(SPATIAL_BINS) if lo < r <= hi), -1)
+        if si < 0:
+            continue
+        for j, (lo, hi) in enumerate(bins_d):
+            if (lo < d <= hi) or (j == len(bins_d) - 1 and d > lo):
+                hist[si, j] += 1.0
+                break
     smooth = np.zeros_like(hist)
-    for i in range(n_spatial):
-        for j in range(n_dbh):
-            smooth[i, j] = hist[i : min(i + 2, n_spatial), j : min(j + 2, n_dbh)].sum()
+    for i in range(hist.shape[0]):
+        for j in range(hist.shape[1]):
+            smooth[i, j] = hist[i : i + 2, j : j + 2].sum()
     return smooth.ravel()
 
 
-def triangle_hash(sides: np.ndarray, area: float, delta_l: float = 0.1, rho: int = 100007, modulus: int = 50000000) -> int:
-    ell_1, ell_2, ell_3 = (int(round(float(x) / delta_l)) for x in sorted(sides))
-    value = (ell_3 * rho + ell_2) % modulus
-    value = (value * rho + ell_1) % modulus
-    value = (value * rho + int(round(area / delta_l))) % modulus
-    return value
-
-
-def _edge_ordered_simplex(centers: np.ndarray, i: int, j: int, k: int) -> tuple[int, int, int]:
-    """Canonical TreeLoc simplex ordering: start from the longest edge."""
-    pts = centers[:, :2]
-    d_ij = float(np.sum((pts[i] - pts[j]) ** 2))
-    d_jk = float(np.sum((pts[j] - pts[k]) ** 2))
-    d_ki = float(np.sum((pts[k] - pts[i]) ** 2))
-
+def order_by_edge_length(pts: list, i: int, j: int, k: int) -> tuple[int, int, int]:
+    """Canonical vertex order of the released code: start from the longest edge."""
+    (xi, yi), (xj, yj), (xk, yk) = pts[i], pts[j], pts[k]
+    d_ij = (xi - xj) ** 2 + (yi - yj) ** 2
+    d_jk = (xj - xk) ** 2 + (yj - yk) ** 2
+    d_ki = (xk - xi) ** 2 + (yk - yi) ** 2
+    a, b, c = i, j, k
+    dbc, dca = d_jk, d_ki
     if d_jk >= d_ij and d_jk >= d_ki:
         a, b, c = j, k, i
-        side_next, side_last = d_ki, d_ij
+        dbc, dca = d_ki, d_ij
     elif d_ki >= d_ij and d_ki >= d_jk:
         a, b, c = k, i, j
-        side_next, side_last = d_ij, d_jk
-    else:
-        a, b, c = i, j, k
-        side_next, side_last = d_jk, d_ki
-
-    if side_next < side_last:
+        dbc, dca = d_ij, d_jk
+    if dbc < dca:
         a, b = b, a
     return (a, b, c)
 
 
-def _knn_simplexes(centers: np.ndarray, knn_k: int, min_side: float, max_side: float) -> set[tuple[int, int, int]]:
-    """Build the nearest-neighbor triangle set used by the public TreeLoc code.
-
-    The paper defines descriptors over tree triples; the released implementation
-    makes that tractable by forming triples from each tree's local KNN
-    neighborhood and deduplicating them after edge-based canonical ordering.
-    """
+def knn_triangles(centers: np.ndarray) -> list[tuple[int, int, int]]:
+    """Triangles over each tree's KNN neighbourhood (k = 10, edge range [2, 30] m)."""
     n = len(centers)
-    simplexes: set[tuple[int, int, int]] = set()
-    pts = centers[:, :2]
+    if n < 3:
+        return []
+    d = np.sqrt(((centers[:, None, :] - centers[None, :, :]) ** 2).sum(-1))
+    pts = [tuple(p) for p in centers.tolist()]
+    triples = set()
     for i in range(n):
-        dists = np.linalg.norm(pts - pts[i], axis=1)
-        neighbors = [
-            int(idx)
-            for idx in np.argsort(dists)
-            if idx != i and min_side <= dists[idx] <= max_side
-        ][:knn_k]
-        for j, k, l in itertools.combinations(neighbors, 3):
-            simplex = _edge_ordered_simplex(centers, j, k, l)
-            simplex_pts = pts[list(simplex)]
-            sides = np.array(
-                [
-                    np.linalg.norm(simplex_pts[0] - simplex_pts[1]),
-                    np.linalg.norm(simplex_pts[1] - simplex_pts[2]),
-                    np.linalg.norm(simplex_pts[0] - simplex_pts[2]),
-                ]
-            )
-            if np.min(sides) >= min_side and np.max(sides) <= max_side:
-                simplexes.add(simplex)
-    return simplexes
+        order = np.argsort(d[i], kind="stable")[: KNN_K + 1].tolist()
+        row = d[i]
+        neigh = sorted(j for j in order if j != i and MIN_EDGE_M <= row[j] <= MAX_EDGE_M)
+        for a, b, c in itertools.combinations(neigh, 3):
+            triples.add(order_by_edge_length(pts, a, b, c))
+    return sorted(triples)
 
 
-def triangle_descriptors(
-    centers: np.ndarray,
-    min_side: float = 2.0,
-    max_side: float = 30.0,
-    knn_k: int = 12,
-) -> dict:
-    table: dict[int, list[tuple[np.ndarray, tuple[int, int, int]]]] = defaultdict(list)
-    if len(centers) < 3:
-        return table
-    for i, j, k in _knn_simplexes(centers, knn_k=knn_k, min_side=min_side, max_side=max_side):
-        pts = centers[[i, j, k], :2]
-        sides = np.array(
-            [np.linalg.norm(pts[0] - pts[1]), np.linalg.norm(pts[1] - pts[2]), np.linalg.norm(pts[0] - pts[2])]
-        )
-        if np.min(sides) < min_side or np.max(sides) > max_side:
-            continue
-        semi = float(np.sum(sides) / 2.0)
-        area = math.sqrt(max(semi * (semi - sides[0]) * (semi - sides[1]) * (semi - sides[2]), 0.0))
-        key = triangle_hash(sides, area)
-        table[key].append((pts.mean(axis=0), (i, j, k)))
-    return table
+def triangle_hash(p0, p1, p2) -> int:
+    """Hash of the quantized sorted side lengths, extended by the area bucket (released code)."""
+    a, b, c = sorted((math.dist(p0, p1), math.dist(p1, p2), math.dist(p2, p0)))
+    e1, e2, e3 = (int(math.floor(x / DELTA_L + 0.5)) for x in (a, b, c))  # std::round
+    h = (e3 * HASH_RHO + e2) % HASH_MOD
+    h = (h * HASH_RHO + e1) % HASH_MOD
+    s = (a + b + c) / 2.0
+    area = math.sqrt(max(s * (s - a) * (s - b) * (s - c), 0.0))
+    return (h * HASH_RHO + int(math.floor(area / DELTA_L + 0.5))) % HASH_MOD
 
 
-def make_scene(raw: dict, use_alignment: bool = True, use_dbh: bool = True) -> SceneDesc:
-    positions = np.array([t["position"] for t in raw["trees"]], dtype=float)
-    axes = np.array([t["axis"] for t in raw["trees"]], dtype=float)
-    dbh = np.array([t["dbh"] for t in raw["trees"]], dtype=float)
-    align = rotation_align_to_z(axes) if use_alignment else np.eye(3)
-    aligned = (align @ positions.T).T if len(positions) else np.zeros((0, 3))
-    centers = aligned[:, :2] if len(aligned) else np.zeros((0, 2))
-    heights = aligned[:, 2] if len(aligned) else np.zeros(0)
-    return SceneDesc(
-        name=raw["name"],
-        pose=np.array(raw["pose"], dtype=float),
-        align=align,
-        centers=centers,
-        heights=heights,
-        dbh=dbh,
-        tdh=tdh_descriptor(centers, dbh, use_dbh=use_dbh),
-        triangles=triangle_descriptors(centers),
-    )
+def make_scene(frame: dict, f: dict, use_alignment: bool = True, use_dbh: bool = True) -> Scene:
+    raw = np.array(
+        [
+            [
+                t[f["x"]], t[f["y"]], t[f["z"]], t[f["axis_x"]], t[f["axis_y"]], t[f["axis_z"]],
+                t[f["dbh"]] if t[f["dbh"]] is not None else t[f["dbh_approximation"]],
+                t[f["score"]], t[f["reconstructed"]], t[f["number_clusters"]],
+            ]
+            for t in frame["trees"]
+        ],
+        dtype=float,
+    ).reshape(-1, 10)
+    g = {"reconstructed": 8, "number_clusters": 9, "score": 7}
+    in_box = (np.abs(raw[:, 0]) <= BOX_HALF_WIDTH_M) & (np.abs(raw[:, 1]) <= BOX_HALF_WIDTH_M)
+    raw = raw[in_box]
+    rec = raw[:, 8] == 1
+    align = axis_alignment(raw[rec, 3:6]) if use_alignment else np.eye(3)
+    pos = raw[:, 0:3] @ align.T
+    sel = select_trees(raw, g)
+    if len(sel):
+        keep = (np.abs(pos[sel, 0]) <= BOX_HALF_WIDTH_M) & (np.abs(pos[sel, 1]) <= BOX_HALF_WIDTH_M)
+        sel = sel[keep]
+    centers = pos[sel, :2] if len(sel) else np.zeros((0, 2))
+    heights = pos[sel, 2] if len(sel) else np.zeros(0)
+    dbh = raw[sel, 6] if len(sel) else np.zeros(0)
+    scene = Scene(frame["id"], align, centers, heights, dbh, tdh_descriptor(centers, dbh, use_dbh))
+    pts = [tuple(p) for p in centers.tolist()]
+    for tri in knn_triangles(centers):
+        h = triangle_hash(pts[tri[0]], pts[tri[1]], pts[tri[2]])
+        scene.hash_list.append(h)
+        scene.hash_last[h] = tri
+    scene.hash_counter = Counter(scene.hash_list)
+    scene.hash_set = frozenset(scene.hash_counter)
+    return scene
 
 
-def chi_square(a: np.ndarray, b: np.ndarray) -> float:
-    return float(np.sum((a - b) ** 2 / (a + b + 1e-10)))
+# ----------------------------------------------------------------------------- matching
 
 
-def fine_score(a: SceneDesc, b: SceneDesc) -> float:
-    cand_keys = set(b.triangles.keys())
-    return float(sum(1 for key in a.triangles.keys() if key in cand_keys))
+def kabsch_2d(src: np.ndarray, dst: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    sm, dm = src.mean(axis=0), dst.mean(axis=0)
+    h = (src - sm).T @ (dst - dm)
+    u, _, vt = np.linalg.svd(h)
+    v = vt.T
+    r = v @ u.T
+    if np.linalg.det(r) < 0.0:
+        v[:, 1] *= -1.0
+        r = v @ u.T
+    return r, dm - r @ sm
 
 
-def count_support(query: SceneDesc, cand: SceneDesc, r: np.ndarray, t: np.ndarray) -> list[tuple[int, int]]:
-    transformed = (r @ query.centers.T).T + t
-    pairs = []
-    for qi, p in enumerate(transformed):
-        dists = np.linalg.norm(cand.centers - p, axis=1)
-        if len(dists) == 0:
-            continue
-        ci = int(np.argmin(dists))
-        if dists[ci] <= 0.40 and abs(query.dbh[qi] - cand.dbh[ci]) <= 0.20:
-            pairs.append((qi, ci))
-    return pairs
+def nearest_query_for_candidates(q_pts: np.ndarray, c_pts: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    d = np.sqrt(((c_pts[:, None, :] - q_pts[None, :, :]) ** 2).sum(-1))
+    idx = d.argmin(axis=1)
+    return idx, d[np.arange(len(c_pts)), idx]
 
 
-def ransac_vertical_offset(query: SceneDesc, cand: SceneDesc, pairs: list[tuple[int, int]]) -> float:
-    if not pairs:
+def hash_count(q: Scene, c: Scene) -> int:
+    common = q.hash_set & c.hash_set
+    return sum(q.hash_counter[h] for h in common)
+
+
+def verify(q: Scene, c: Scene, first_step_only: bool = False) -> dict:
+    """Two-step geometric verification (upstream Compute2DTransformation)."""
+    out = {"overlap": 0.0, "R": np.eye(2), "t": np.zeros(2), "matches": []}
+    common = q.hash_last.keys() & c.hash_last.keys()
+    if len(common) < 2 or len(q.centers) == 0 or len(c.centers) == 0:
+        return out
+    qc = np.array([q.centers[list(q.hash_last[h])].mean(axis=0) for h in common])
+    cc = np.array([c.centers[list(c.hash_last[h])].mean(axis=0) for h in common])
+    r, t = kabsch_2d(qc, cc)
+    if not first_step_only:
+        idx, dist = nearest_query_for_candidates(q.centers @ r.T + t, c.centers)
+        ok = (np.abs(q.dbh[idx] - c.dbh) <= INIT_MATCH_DBH_M) & (dist < INIT_MATCH_DIST_M)
+        if ok.sum() >= 2:
+            r, t = kabsch_2d(q.centers[idx[ok]], c.centers[ok])
+    idx, dist = nearest_query_for_candidates(q.centers @ r.T + t, c.centers)
+    ok = dist < FINAL_MATCH_DIST_M
+    matches = [(int(i), int(j)) for j, i in zip(np.flatnonzero(ok), idx[ok])]
+    union = len(q.centers) + len(c.centers) - len(matches)
+    out.update(overlap=len(matches) / union if union > 0 else 0.0, R=r, t=t, matches=matches)
+    return out
+
+
+def ransac_z_offset(q: Scene, c: Scene, matches: list[tuple[int, int]], rng: np.random.Generator) -> float:
+    """Vertical offset (candidate minus query base height) by RANSAC, as in the released code."""
+    if not matches:
         return 0.0
-    offsets = np.array([cand.heights[ci] - query.heights[qi] for qi, ci in pairs], dtype=float)
-    best = float(np.median(offsets))
-    best_count = -1
-    for candidate in offsets:
-        count = int(np.sum(np.abs(offsets - candidate) <= 0.20))
-        if count > best_count:
-            best_count = count
-            best = float(candidate)
-    inliers = offsets[np.abs(offsets - best) <= 0.20]
-    return float(np.median(inliers)) if len(inliers) else best
+    diffs = np.array([c.heights[j] - q.heights[i] for i, j in matches])
+    if len(diffs) == 1:
+        return float(diffs[0])
+    n = len(diffs)
+    sample = min(Z_RANSAC_SAMPLE, n)
+    best_count, best = 0, None
+    for _ in range(Z_RANSAC_ITERS):
+        guess = diffs[rng.integers(0, n, size=sample)].mean()
+        inl = np.abs(diffs - guess) < Z_INLIER_M
+        cnt = int(inl.sum())
+        if cnt > best_count and cnt >= Z_MIN_INLIER_RATIO * n:
+            best_count, best = cnt, float(diffs[inl].mean())
+    return best if best is not None else float(diffs.mean())
 
 
-def verify(query: SceneDesc, cand: SceneDesc, max_hypotheses: int = 600) -> dict:
-    common_keys = query.triangles.keys() & cand.triangles.keys()
-    if not common_keys:
-        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
-
-    # Paper Sec. III-E: first estimate an SE(2) transform from matched
-    # triangle centroids, then refine it using nearby tree centers.
-    q_centroids, c_centroids = [], []
-    for key in sorted(common_keys):
-        q_centroid, _ = query.triangles[key][-1]
-        c_centroid, _ = cand.triangles[key][-1]
-        q_centroids.append(q_centroid)
-        c_centroids.append(c_centroid)
-    if len(q_centroids) < 2:
-        return {"overlap": 0.0, "translation": [0.0, 0.0, 0.0], "yaw": 0.0, "num_matches": 0}
-
-    r_c, t_c = se2_align(np.array(q_centroids), np.array(c_centroids))
-    initial_pairs = count_support(query, cand, r_c, t_c)
-    if len(initial_pairs) < 2:
-        return {
-            "overlap": 0.0,
-            "translation": [0.0, 0.0, 0.0],
-            "yaw": 0.0,
-            "num_matches": len(initial_pairs),
-        }
-
-    transformed = (r_c @ query.centers.T).T + t_c
-    src = transformed[[p[0] for p in initial_pairs]]
-    dst = cand.centers[[p[1] for p in initial_pairs]]
-    r_f, t_f = se2_align(src, dst)
-    r = r_f @ r_c
-    t2 = r_f @ t_c + t_f
-    pairs = count_support(query, cand, r, t2)
-
-    dz = ransac_vertical_offset(query, cand, pairs)
-    overlap = len(pairs) / max(1, len(query.centers) + len(cand.centers) - len(pairs))
+def compose_pose(q: Scene, c: Scene, v: dict, dz: float) -> tuple[np.ndarray, np.ndarray]:
     r4 = np.eye(3)
-    r4[:2, :2] = r
-    t4 = np.array([float(t2[0]), float(t2[1]), dz])
-    # Paper Eq. final composition: undo candidate axis alignment, apply the
-    # verified 4-DoF transform, then apply query axis alignment.
-    final_r = cand.align.T @ r4 @ query.align
-    final_t = cand.align.T @ t4
-    return {
-        "overlap": float(overlap),
-        "translation": final_t.tolist(),
-        "yaw": yaw_from_r2(final_r[:2, :2]),
-        "rotation": final_r.tolist(),
-        "num_matches": len(pairs),
-    }
+    r4[:2, :2] = v["R"]
+    t4 = np.array([v["t"][0], v["t"][1], dz])
+    rot = c.align.T @ r4 @ q.align
+    trans = c.align.T @ t4
+    return rot, trans
 
 
-def run_treeloc(data: dict, top_tdh: int, top_fine: int, use_alignment: bool, use_dbh: bool) -> dict:
-    db = [make_scene(s, use_alignment=use_alignment, use_dbh=use_dbh) for s in data["database"]]
-    queries = [make_scene(s, use_alignment=use_alignment, use_dbh=use_dbh) for s in data["query"]]
+def localize(payload: dict, top_tdh: int, top_hash: int, use_alignment: bool, use_dbh: bool, first_step_only: bool, seed: int = 0) -> dict:
+    fields = {name: i for i, name in enumerate(payload["tree_fields"])}
     predictions = []
-    pair_scores = []
-    for q in queries:
-        coarse = sorted(((chi_square(q.tdh, c.tdh), c) for c in db), key=lambda x: x[0])[:top_tdh]
-        fine = sorted(((fine_score(q, c), c, dist) for dist, c in coarse), key=lambda x: (-x[0], x[2]))[:top_fine]
-        verified = []
-        for score, cand, dist in fine:
-            v = verify(q, cand)
-            verified.append((v["overlap"], score, -dist, cand, v))
-        verified.sort(reverse=True, key=lambda x: (x[0], x[1], x[2]))
-        best_overlap, best_fine, _, best, best_v = verified[0]
-        predictions.append(
-            {
-                "query": q.name,
-                "candidate": best.name,
-                "similarity": float(best_overlap + 0.01 * best_fine),
-                "estimated_query_to_candidate": best_v,
-            }
-        )
-        scored_names = {best.name}
-        for score, cand, dist in fine:
-            pair_scores.append({"query": q.name, "candidate": cand.name, "score": float(score - 0.02 * dist)})
-            scored_names.add(cand.name)
-        # Include low scores for non-retrieved candidates so PR/AUC sees negatives.
-        for cand in db:
-            if cand.name not in scored_names:
-                pair_scores.append({"query": q.name, "candidate": cand.name, "score": -chi_square(q.tdh, cand.tdh)})
-    return {"method": "treeloc", "predictions": predictions, "pair_scores": pair_scores}
+    for seq in payload["sequences"]:
+        db = [make_scene(fr, fields, use_alignment, use_dbh) for fr in seq["database"]]
+        queries = [make_scene(fr, fields, use_alignment, use_dbh) for fr in seq["queries"]]
+        db_tdh = np.stack([s.tdh for s in db])
+        for q in queries:
+            chi = ((db_tdh - q.tdh) ** 2 / (db_tdh + q.tdh + 1e-10)).sum(axis=1)
+            order = np.argsort(chi, kind="stable")
+            coarse = order if top_tdh <= 0 else order[:top_tdh]
+            ranked = sorted(((hash_count(q, db[i]), -chi[i], int(i)) for i in coarse), key=lambda x: (-x[0], -x[1]))
+            fine = ranked if top_hash <= 0 else ranked[:top_hash]
+            best_overlap, best_i, best_v = -1.0, None, None
+            for _, _, i in fine:
+                v = verify(q, db[i], first_step_only)
+                if best_overlap <= v["overlap"]:  # ties: the later candidate wins, as in the released code
+                    best_overlap, best_i, best_v = v["overlap"], i, v
+            cand = db[best_i]
+            rng = np.random.default_rng(seed)
+            dz = ransac_z_offset(q, cand, best_v["matches"], rng)
+            rot, trans = compose_pose(q, cand, best_v, dz)
+            predictions.append(
+                {
+                    "query": q.id,
+                    "candidate": cand.id,
+                    "score": float(best_overlap),
+                    "rotation": rot.tolist(),
+                    "translation": trans.tolist(),
+                }
+            )
+    return {"method": "treeloc", "predictions": predictions}
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="data/forest_scenes.json")
-    parser.add_argument("--output", default="artifacts/treeloc_results.json")
-    parser.add_argument("--top-tdh", type=int, default=100)
-    parser.add_argument("--top-fine", type=int, default=10)
-    parser.add_argument("--no-alignment", action="store_true")
-    parser.add_argument("--no-dbh", action="store_true")
+    parser.add_argument("--input", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--top-tdh", type=int, default=100, help="TDH candidates kept (<=0: all)")
+    parser.add_argument("--top-hash", type=int, default=10, help="candidates verified after hash ranking (<=0: all)")
+    parser.add_argument("--no-alignment", action="store_true", help="ablation: skip tree-axis roll/pitch correction")
+    parser.add_argument("--no-dbh", action="store_true", help="ablation: TDH without DBH bins")
+    parser.add_argument("--first-step-only", action="store_true", help="ablation TreeLoc-f: centroid alignment only")
+    parser.add_argument("--seed", type=int, default=0, help="seed of the vertical-offset RANSAC")
     args = parser.parse_args()
-
-    data = json.loads(Path(args.data).read_text())
-    result = run_treeloc(data, args.top_tdh, args.top_fine, not args.no_alignment, not args.no_dbh)
-    out = Path(args.output)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2))
-    print(f"wrote {out}")
+    payload = json.loads(Path(args.input).read_text())
+    result = localize(payload, args.top_tdh, args.top_hash, not args.no_alignment, not args.no_dbh, args.first_step_only, args.seed)
+    Path(args.output).write_text(json.dumps(result))
 
 
 if __name__ == "__main__":

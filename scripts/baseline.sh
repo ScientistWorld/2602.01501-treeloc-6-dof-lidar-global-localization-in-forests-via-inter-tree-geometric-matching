@@ -1,30 +1,6 @@
 #!/bin/bash
-# Run a baseline method from the paper.
-#
-# Baselines are simple reference methods the paper compares against. 
-# Implement this only if applicable, i.e. the paper has baselines.
-# You do not need to implement all baselines to begin — 
-# just enough to validate that the evaluation pipeline works 
-# and provide a reference point. You can decide to expand more baselines later.
-# Each baseline must be actually run and scored through evaluate.sh
-# so the numbers are verified, not self-reported.
-# You can decide what this baseline script should do yourself.
-#
-# Usage:
-#   bash scripts/baseline.sh <name>
-
-set -e
-
-cd /home/user
-
-mkdir -p artifacts data
-
-if [ ! -f data/forest_scenes.json ]; then
-  python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
-fi
-
-python baseline/tdh_baseline.py \
-  --data data/forest_scenes.json \
-  --output artifacts/tdh_baseline_results.json
-
-bash scripts/evaluate.sh
+# Run the simple baseline (TDH-only global retrieval) on the visible train
+# slice and score it.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+bash scripts/evaluate_train.sh tdh_baseline

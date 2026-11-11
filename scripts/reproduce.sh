@@ -1,26 +1,14 @@
 #!/bin/bash
-# Reproduce the paper's results end-to-end.
+# Reproduce the gym end to end: score the reference (TreeLoc), its
+# no-alignment ablation and the TDH-only baseline on the train slice and on the
+# hidden test slice, then validate the workspace.
 #
-# This script runs inside the compute container and should call
-# scripts/baseline.sh and scripts/method.sh to run baselines and
-# the paper's method, each of which calls scripts/evaluate.sh.
-#
-# Assumes:
-#   - Container is built (environment/container.sif)
-#   - Data and models are downloaded (via scripts/download.sh)
-#   - Working directory is /home/user
-#
-# This is the "gold standard" reproduction — 
-# You do not need to run this, but keep this in good shape
-# so other agents can easily run a full loop of reproduction and get the paper's numbers.
-
-set -e
-
-cd /home/user
-
-mkdir -p artifacts data
-python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
-python baseline/tdh_baseline.py --data data/forest_scenes.json --output artifacts/tdh_baseline_results.json
-python method/treeloc.py --data data/forest_scenes.json --output artifacts/treeloc_results.json
-python method/treeloc.py --data data/forest_scenes.json --output artifacts/treeloc_no_alignment_results.json --no-alignment
-bash scripts/evaluate.sh
+# The benchmark data are committed (data/train/, eval/test/data/); to rebuild
+# them from the public source run scripts/download.sh on a node with internet.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+export TREELOC_EVAL_JOBS="${TREELOC_EVAL_JOBS:-3}"
+bash scripts/evaluate_train.sh
+cp scoring/scores_train.json scoring/scores.json
+bash scripts/evaluate_test.sh
+python validate.py --compare

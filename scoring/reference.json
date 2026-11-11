@@ -1,62 +1,66 @@
 {
   "experiments": {
-    "synthetic_forest_localization": {
-      "description": "Scaled tree-inventory reproduction of TreeLoc's core forest place-recognition and localization claim; reference values are TreeLoc and BTC results from the paper's Oxford Stein 3-DoF localization setting where metrics overlap.",
-      "weight": 1.0,
+    "intra_session_localization": {
+      "description": "Intra-session forest place recognition and 6-DoF localization on real RealtimeTrees tree inventories released by the TreeLoc authors (Oxford Forest dataset). Train: Oxford Evo. Hidden test: Oxford Stein am Rhein, the paper's Table I/III localization setting. The first part of the sequence is the database; later revisits (>= 50 frames after the database ends, within 10 m of a database frame) are the queries.",
+      "weight": 0.6,
       "primary_metric": "R_at_50",
       "metrics": {
         "R_at_1": {
           "higher_is_better": true,
-          "coefficient": 0.6,
-          "description": "Fraction of queries whose top retrieved database scene is within the positive-distance neighborhood."
+          "coefficient": 0.8,
+          "description": "Fraction of evaluated queries whose top-ranked database frame lies within 10 m (xy) of the query."
         },
         "F1": {
           "higher_is_better": true,
           "coefficient": 0.4,
-          "description": "Best thresholded pair-classification F1 over all query/database similarity scores."
+          "description": "Maximum F1 over score thresholds of the top-1 matches: precision = correct accepted / accepted, recall = correct accepted / all evaluated queries (every evaluated query has a true match)."
         },
         "AUC": {
           "higher_is_better": true,
           "coefficient": 0.4,
-          "description": "Average precision for ranking positive query/database pairs above negative pairs."
+          "description": "Area under the precision-recall curve of the top-1 matches traced by the score threshold (same precision and recall as F1; equal scores share one threshold)."
         },
         "R_at_50": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Fraction of queries whose top retrieved match also yields a relative pose within the localization thresholds."
+          "description": "Fraction of evaluated queries whose estimated 6-DoF relative pose to the returned database frame has translation error <= 0.5 m and rotation error <= 5 deg (paper's R@50)."
         },
         "SR": {
           "higher_is_better": true,
-          "coefficient": 0.6,
-          "description": "Pose-estimation success rate conditioned on retrieving a positive top match."
+          "coefficient": 0.5,
+          "description": "Among queries whose top-1 frame is correct (within 10 m), the fraction whose 6-DoF pose meets the R@50 thresholds."
         },
         "TE_m": {
           "higher_is_better": false,
-          "coefficient": -0.5,
-          "description": "Mean translation error in meters over successfully localized top matches."
+          "coefficient": -0.4,
+          "description": "Mean 3D translation error (m) over correct top-1 matches that meet the R@50 thresholds (0.5 if none)."
         },
         "RE_deg": {
           "higher_is_better": false,
-          "coefficient": -0.3,
-          "description": "Mean rotation error in degrees over successfully localized top matches."
+          "coefficient": -0.4,
+          "description": "Mean rotation error (deg, geodesic) over correct top-1 matches that meet the R@50 thresholds (5.0 if none)."
         },
         "TE_all_m": {
           "higher_is_better": false,
-          "coefficient": -0.8,
-          "description": "Mean translation error in meters over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
+          "coefficient": -0.5,
+          "description": "Mean translation error (m) of the returned relative pose over all evaluated queries, each capped at 10 m (gym addition; unconditional companion of TE_m)."
         },
         "RE_all_deg": {
           "higher_is_better": false,
-          "coefficient": -0.4,
-          "description": "Mean rotation error in degrees over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
+          "coefficient": -0.3,
+          "description": "Mean rotation error (deg) of the returned relative pose over all evaluated queries, each capped at 180 deg (gym addition; unconditional companion of RE_deg)."
         }
       },
       "results": {
-        "tdh_baseline": {
-          "type": "baseline"
-        },
-        "treeloc_no_alignment": {
-          "type": "baseline"
+        "treeloc": {
+          "type": "proposed",
+          "R_at_1": 0.871,
+          "F1": 0.945,
+          "AUC": 0.988,
+          "R_at_50": 0.97,
+          "SR": 0.987,
+          "TE_m": 0.053,
+          "RE_deg": 0.137
         },
         "btc": {
           "type": "baseline",
@@ -64,21 +68,115 @@
           "F1": 0.774,
           "AUC": 0.803,
           "R_at_50": 0.638,
-          "SR": 0.780,
+          "SR": 0.78,
           "TE_m": 0.225,
           "RE_deg": 0.641
         },
+        "treeloc_no_alignment": {
+          "type": "baseline",
+          "R_at_1": 0.748,
+          "F1": 0.878,
+          "R_at_50": 0.701
+        },
+        "tdh_baseline": {
+          "type": "baseline"
+        }
+      },
+      "_paper_6dof_localization_stein": {
+        "source": "Paper Table III, 6-DoF rows (TreeLoc*, BTC*), Oxford Stein. The gym scores full 6-DoF poses, so these are the comparable localization numbers; the 3-DoF row is kept under results unchanged.",
+        "treeloc": {
+          "R_at_50": 0.908,
+          "SR": 0.94,
+          "TE_m": 0.126,
+          "RE_deg": 1.013
+        },
+        "treeloc_f": {
+          "R_at_50": 0.876,
+          "SR": 0.916,
+          "TE_m": 0.168,
+          "RE_deg": 1.055
+        },
+        "btc": {
+          "R_at_50": 0.29,
+          "SR": 0.398,
+          "TE_m": 0.236,
+          "RE_deg": 1.953
+        }
+      },
+      "_notes": "results.treeloc / results.btc are the paper's Oxford Stein numbers (Table I place recognition; Table III 3-DoF localization), kept unchanged. results.treeloc_no_alignment is Table V (Stein, 100 TDH candidates, DBH, no alignment). Protocol differences: the gym uses a fixed time split (database = first 50% of Stein frames) instead of every earlier frame, 6-DoF rather than 3-DoF errors, and recall over all evaluated queries for F1/AUC (the released code counts a wrong but rejected top-1 as a true negative), so the paper's F1/AUC are not directly comparable (here F1 <= 2 R@1 / (1 + R@1))."
+    },
+    "inter_session_localization": {
+      "description": "Inter-session (temporal change, ~6 months) forest place recognition and 6-DoF localization on the authors' tree inventories of Wild-Places Venman: queries from V-03, database from V-02. Hidden test: the official Wild-Places Venman test regions. Train: frames at least 50 m outside those regions.",
+      "weight": 0.4,
+      "primary_metric": "R_at_1",
+      "metrics": {
+        "R_at_1": {
+          "higher_is_better": true,
+          "coefficient": 0.8,
+          "description": "Fraction of evaluated queries whose top-ranked database frame lies within 10 m (xy) of the query."
+        },
+        "F1": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Maximum F1 over score thresholds of the top-1 matches: precision = correct accepted / accepted, recall = correct accepted / all evaluated queries (every evaluated query has a true match)."
+        },
+        "AUC": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Area under the precision-recall curve of the top-1 matches traced by the score threshold (same precision and recall as F1; equal scores share one threshold)."
+        },
+        "R_at_50": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of evaluated queries whose estimated 6-DoF relative pose to the returned database frame has translation error <= 0.5 m and rotation error <= 5 deg (paper's R@50)."
+        },
+        "SR": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Among queries whose top-1 frame is correct (within 10 m), the fraction whose 6-DoF pose meets the R@50 thresholds."
+        },
+        "TE_m": {
+          "higher_is_better": false,
+          "coefficient": -0.4,
+          "description": "Mean 3D translation error (m) over correct top-1 matches that meet the R@50 thresholds (0.5 if none)."
+        },
+        "RE_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.4,
+          "description": "Mean rotation error (deg, geodesic) over correct top-1 matches that meet the R@50 thresholds (5.0 if none)."
+        },
+        "TE_all_m": {
+          "higher_is_better": false,
+          "coefficient": -0.5,
+          "description": "Mean translation error (m) of the returned relative pose over all evaluated queries, each capped at 10 m (gym addition; unconditional companion of TE_m)."
+        },
+        "RE_all_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.3,
+          "description": "Mean rotation error (deg) of the returned relative pose over all evaluated queries, each capped at 180 deg (gym addition; unconditional companion of RE_deg)."
+        }
+      },
+      "results": {
         "treeloc": {
           "type": "proposed",
-          "R_at_1": 0.871,
-          "F1": 0.945,
-          "AUC": 0.988,
-          "R_at_50": 0.970,
-          "SR": 0.987,
-          "TE_m": 0.053,
-          "RE_deg": 0.137
+          "R_at_1": 0.92,
+          "F1": 0.984,
+          "AUC": 0.993
+        },
+        "btc": {
+          "type": "baseline",
+          "R_at_1": 0.302,
+          "F1": 0.5,
+          "AUC": 0.337
+        },
+        "treeloc_no_alignment": {
+          "type": "baseline"
+        },
+        "tdh_baseline": {
+          "type": "baseline"
         }
-      }
+      },
+      "_notes": "results are the paper's Table II Wild-Places Venman inter-session means over 12 query-database pairs (the gym uses the V-03 -> V-02 pair only). The paper reports no inter-session localization accuracy. F1/AUC use recall over all evaluated queries (see intra_session_localization._notes)."
     }
   }
 }
