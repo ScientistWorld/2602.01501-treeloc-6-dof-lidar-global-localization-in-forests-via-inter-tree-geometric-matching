@@ -1,0 +1,9 @@
+_state/
+cache/
+**/method.log
+**/test.log
+**/train.log
+**/results.json
+**/forged_scores.json
+**/artifact_inventory.json
+**/geometry_diagnostics.json

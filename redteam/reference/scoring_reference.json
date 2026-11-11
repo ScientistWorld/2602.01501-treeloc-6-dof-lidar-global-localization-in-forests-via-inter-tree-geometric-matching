@@ -1,0 +1,84 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "description": "Scaled tree-inventory reproduction of TreeLoc's core forest place-recognition and localization claim; reference values are TreeLoc and BTC results from the paper's Oxford Stein 3-DoF localization setting where metrics overlap.",
+      "weight": 1.0,
+      "primary_metric": "R_at_50",
+      "metrics": {
+        "R_at_1": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Fraction of queries whose top retrieved database scene is within the positive-distance neighborhood."
+        },
+        "F1": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Best thresholded pair-classification F1 over all query/database similarity scores."
+        },
+        "AUC": {
+          "higher_is_better": true,
+          "coefficient": 0.4,
+          "description": "Average precision for ranking positive query/database pairs above negative pairs."
+        },
+        "R_at_50": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of queries whose top retrieved match also yields a relative pose within the localization thresholds."
+        },
+        "SR": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Pose-estimation success rate conditioned on retrieving a positive top match."
+        },
+        "TE_m": {
+          "higher_is_better": false,
+          "coefficient": -0.5,
+          "description": "Mean translation error in meters over successfully localized top matches."
+        },
+        "RE_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.3,
+          "description": "Mean rotation error in degrees over successfully localized top matches."
+        },
+        "TE_all_m": {
+          "higher_is_better": false,
+          "coefficient": -0.8,
+          "description": "Mean translation error in meters over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
+        },
+        "RE_all_deg": {
+          "higher_is_better": false,
+          "coefficient": -0.4,
+          "description": "Mean rotation error in degrees over all top predictions, assigning a fixed miss penalty when the top retrieved scene is outside the positive-distance neighborhood."
+        }
+      },
+      "results": {
+        "tdh_baseline": {
+          "type": "baseline"
+        },
+        "treeloc_no_alignment": {
+          "type": "baseline"
+        },
+        "btc": {
+          "type": "baseline",
+          "R_at_1": 0.611,
+          "F1": 0.774,
+          "AUC": 0.803,
+          "R_at_50": 0.638,
+          "SR": 0.780,
+          "TE_m": 0.225,
+          "RE_deg": 0.641
+        },
+        "treeloc": {
+          "type": "proposed",
+          "R_at_1": 0.871,
+          "F1": 0.945,
+          "AUC": 0.988,
+          "R_at_50": 0.970,
+          "SR": 0.987,
+          "TE_m": 0.053,
+          "RE_deg": 0.137
+        }
+      }
+    }
+  }
+}
