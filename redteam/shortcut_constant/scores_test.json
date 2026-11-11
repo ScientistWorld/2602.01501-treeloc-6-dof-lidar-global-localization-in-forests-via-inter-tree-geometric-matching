@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_constant": "artifacts/shortcut_constant_results.json"
+      },
+      "results": {
+        "shortcut_constant": {
+          "R_at_1": 0.08333333333333333,
+          "F1": 0.15714285714285714,
+          "AUC": 0.10793090757272618,
+          "R_at_50": 0.0,
+          "SR": 0.0,
+          "TE_m": 999.0,
+          "RE_deg": 999.0,
+          "TE_all_m": 9.330217122126378,
+          "RE_all_deg": 165.38096512228793
+        }
+      }
+    }
+  }
+}

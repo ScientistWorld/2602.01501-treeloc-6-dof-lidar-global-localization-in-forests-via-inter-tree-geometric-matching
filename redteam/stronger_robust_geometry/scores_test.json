@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "stronger_robust_geometry": "artifacts/stronger_robust_geometry_results.json"
+      },
+      "results": {
+        "stronger_robust_geometry": {
+          "R_at_1": 1.0,
+          "F1": 1.0,
+          "AUC": 1.0,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 0.015008486146489822,
+          "RE_deg": 0.06908344242161261,
+          "TE_all_m": 0.015008486146489822,
+          "RE_all_deg": 0.06908344242161261
+        }
+      }
+    }
+  }
+}

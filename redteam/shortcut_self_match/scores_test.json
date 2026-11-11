@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_self_match": "artifacts/shortcut_self_match_results.json"
+      },
+      "results": {
+        "shortcut_self_match": {
+          "R_at_1": 1.0,
+          "F1": 0.9652173913043478,
+          "AUC": 0.9853596948282405,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 0.0,
+          "RE_deg": 2.2207508757001615e-07,
+          "TE_all_m": 0.0,
+          "RE_all_deg": 2.2207508757001615e-07
+        }
+      }
+    }
+  }
+}

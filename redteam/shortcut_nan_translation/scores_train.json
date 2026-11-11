@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_nan_translation": "artifacts/shortcut_nan_translation_results.json"
+      },
+      "results": {
+        "shortcut_nan_translation": {
+          "R_at_1": 0.9166666666666666,
+          "F1": 0.6253521126760564,
+          "AUC": 0.6193633887287198,
+          "R_at_50": 0.0,
+          "SR": 0.0,
+          "TE_m": 999.0,
+          "RE_deg": 999.0,
+          "TE_all_m": NaN,
+          "RE_all_deg": 15.65885126454455
+        }
+      }
+    }
+  }
+}

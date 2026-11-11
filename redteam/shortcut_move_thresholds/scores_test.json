@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_move_thresholds": "artifacts/shortcut_move_thresholds_results.json"
+      },
+      "results": {
+        "shortcut_move_thresholds": {
+          "R_at_1": 1.0,
+          "F1": 0.9652173913043478,
+          "AUC": 0.9853596948282405,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 1.4640065921563092,
+          "RE_deg": 7.582727291220343,
+          "TE_all_m": 1.4640065921563092,
+          "RE_all_deg": 7.582727291220343
+        }
+      }
+    }
+  }
+}

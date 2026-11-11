@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "weaker_no_alignment": "artifacts/weaker_no_alignment_results.json"
+      },
+      "results": {
+        "weaker_no_alignment": {
+          "R_at_1": 0.75,
+          "F1": 0.6182965299684543,
+          "AUC": 0.6203964989477765,
+          "R_at_50": 0.125,
+          "SR": 0.16666666666666666,
+          "TE_m": 0.12229343157981547,
+          "RE_deg": 2.8531395597443425,
+          "TE_all_m": 3.232755922632718,
+          "RE_all_deg": 49.47745949888071
+        }
+      }
+    }
+  }
+}

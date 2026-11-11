@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_generator_answers": "artifacts/shortcut_generator_answers_results.json"
+      },
+      "results": {
+        "shortcut_generator_answers": {
+          "R_at_1": 1.0,
+          "F1": 1.0,
+          "AUC": 1.0,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 5.987129727551189e-15,
+          "RE_deg": 2.7238418214192173e-07,
+          "TE_all_m": 5.987129727551189e-15,
+          "RE_all_deg": 2.7238418214192173e-07
+        }
+      }
+    }
+  }
+}

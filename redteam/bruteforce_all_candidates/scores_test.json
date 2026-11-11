@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "bruteforce_all_candidates": "artifacts/bruteforce_all_candidates_results.json"
+      },
+      "results": {
+        "bruteforce_all_candidates": {
+          "R_at_1": 0.8333333333333334,
+          "F1": 0.6498194945848376,
+          "AUC": 0.6437143872757706,
+          "R_at_50": 0.7916666666666666,
+          "SR": 0.95,
+          "TE_m": 0.0354806171870876,
+          "RE_deg": 0.21211876819505485,
+          "TE_all_m": 1.8594712870070698,
+          "RE_all_deg": 30.27374413235317
+        }
+      }
+    }
+  }
+}

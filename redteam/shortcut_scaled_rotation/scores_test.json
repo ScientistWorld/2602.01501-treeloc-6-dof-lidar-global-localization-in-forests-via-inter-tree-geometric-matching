@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_scaled_rotation": "artifacts/shortcut_scaled_rotation_results.json"
+      },
+      "results": {
+        "shortcut_scaled_rotation": {
+          "R_at_1": 0.9166666666666666,
+          "F1": 0.6545454545454545,
+          "AUC": 0.6506440311753119,
+          "R_at_50": 0.8333333333333334,
+          "SR": 0.9090909090909091,
+          "TE_m": 0.056286874144603094,
+          "RE_deg": 0.0,
+          "TE_all_m": 1.2233793451691832,
+          "RE_all_deg": 15.0
+        }
+      }
+    }
+  }
+}

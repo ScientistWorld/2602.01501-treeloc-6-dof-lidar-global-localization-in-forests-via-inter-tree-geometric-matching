@@ -1,8 +1,4 @@
-# Once you set action to 'submit' or 'done', STOP immediately.
-# Do NOT sleep, poll, or wait for jobs. The system reads this file
-# only after your turn ends.
-action: pending
+action: submit
 gpus: 0
 test: false
-milestone: core_claim
-notes: ""
+notes: "TreeLoc audit: three reference seeds, genuine stronger/weaker methods, exhaustive candidate search, and major scoring shortcuts; saves per-run hidden-test scores and restores mutable inputs."

@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_forge_scores": "artifacts/shortcut_forge_scores_results.json"
+      },
+      "results": {
+        "shortcut_forge_scores": {
+          "R_at_1": 0.041666666666666664,
+          "F1": 0.16165090283748926,
+          "AUC": 0.13142221299042847,
+          "R_at_50": 0.0,
+          "SR": 0.0,
+          "TE_m": 999.0,
+          "RE_deg": 999.0,
+          "TE_all_m": 9.954771992069729,
+          "RE_all_deg": 172.62995258510264
+        }
+      }
+    }
+  }
+}

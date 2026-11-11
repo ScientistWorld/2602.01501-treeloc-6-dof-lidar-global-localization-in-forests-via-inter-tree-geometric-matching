@@ -1,0 +1,47 @@
+{
+  "name": "shortcut_serial_identity",
+  "seed": 0,
+  "hidden_test_arguments": [],
+  "evaluator_hashes_before": {
+    "eval/evaluate_treeloc.py": "c59abd9be9104955afe47cd537072bddbf47219e44d58fdf1ac913c1120b0351",
+    "eval/train/evaluate.py": "77ae973f9f1d3b9e70999c071bfbf2a91ea508646e44fe7e0bd6574f47de1d86",
+    "eval/test/evaluate.py": "9c13d551759640d1c87e5f69ca6f2ae9d7beeb978131193a23d097cad3f84480",
+    "scripts/evaluate_test.sh": "973e5b5672d5b5d96afb66c811cb0e457102e95c35cb0235b3becded7be36e71"
+  },
+  "method": {
+    "exit_code": 0,
+    "seconds": 0.2054288329964038,
+    "command": [
+      "/usr/local/bin/python",
+      "method/redteam_attempt.py",
+      "shortcut_serial_identity",
+      "--seed",
+      "0"
+    ]
+  },
+  "train": {
+    "exit_code": 0,
+    "seconds": 0.17267495600390248,
+    "command": [
+      "bash",
+      "scripts/evaluate_train.sh",
+      "shortcut_serial_identity:artifacts/shortcut_serial_identity_results.json"
+    ]
+  },
+  "test": {
+    "exit_code": 0,
+    "seconds": 0.2658528739993926,
+    "command": [
+      "bash",
+      "scripts/evaluate_test.sh"
+    ]
+  },
+  "scorefile_exists": true,
+  "evaluator_hashes_after": {
+    "eval/evaluate_treeloc.py": "c59abd9be9104955afe47cd537072bddbf47219e44d58fdf1ac913c1120b0351",
+    "eval/train/evaluate.py": "77ae973f9f1d3b9e70999c071bfbf2a91ea508646e44fe7e0bd6574f47de1d86",
+    "eval/test/evaluate.py": "9c13d551759640d1c87e5f69ca6f2ae9d7beeb978131193a23d097cad3f84480",
+    "scripts/evaluate_test.sh": "973e5b5672d5b5d96afb66c811cb0e457102e95c35cb0235b3becded7be36e71"
+  },
+  "restored": true
+}

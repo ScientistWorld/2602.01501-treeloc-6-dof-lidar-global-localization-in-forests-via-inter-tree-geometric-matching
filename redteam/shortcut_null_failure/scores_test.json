@@ -1,0 +1,19 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "results": {
+        "shortcut_null_failure": {
+          "R_at_1": 1.0,
+          "F1": 1.0,
+          "AUC": 1.0,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 0.0,
+          "RE_deg": 0.0,
+          "TE_all_m": 0.0,
+          "RE_all_deg": 0.0
+        }
+      }
+    }
+  }
+}

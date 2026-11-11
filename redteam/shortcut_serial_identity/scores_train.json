@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_serial_identity": "artifacts/shortcut_serial_identity_results.json"
+      },
+      "results": {
+        "shortcut_serial_identity": {
+          "R_at_1": 1.0,
+          "F1": 0.9747899159663865,
+          "AUC": 0.9911173125866596,
+          "R_at_50": 0.041666666666666664,
+          "SR": 0.041666666666666664,
+          "TE_m": 0.4708429991848907,
+          "RE_deg": 1.9737475692586914,
+          "TE_all_m": 1.6465510984731198,
+          "RE_all_deg": 7.650435747732643
+        }
+      }
+    }
+  }
+}

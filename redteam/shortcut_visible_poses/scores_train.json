@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "shortcut_visible_poses": "artifacts/shortcut_visible_poses_results.json"
+      },
+      "results": {
+        "shortcut_visible_poses": {
+          "R_at_1": 1.0,
+          "F1": 1.0,
+          "AUC": 1.0,
+          "R_at_50": 1.0,
+          "SR": 1.0,
+          "TE_m": 7.0346256816233105e-15,
+          "RE_deg": 1.0061818914381111e-07,
+          "TE_all_m": 7.0346256816233105e-15,
+          "RE_all_deg": 1.0061818914381111e-07
+        }
+      }
+    }
+  }
+}

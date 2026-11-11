@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "train",
+      "query_count": 24,
+      "artifact_paths": {
+        "baseline_tdh": "artifacts/baseline_tdh_results.json"
+      },
+      "results": {
+        "baseline_tdh": {
+          "R_at_1": 0.7083333333333334,
+          "F1": 0.5566037735849056,
+          "AUC": 0.588016321816485,
+          "R_at_50": 0.041666666666666664,
+          "SR": 0.058823529411764705,
+          "TE_m": 0.4708429991848907,
+          "RE_deg": 1.9737475692586914,
+          "TE_all_m": 4.579102108872222,
+          "RE_all_deg": 57.98489019661406
+        }
+      }
+    }
+  }
+}

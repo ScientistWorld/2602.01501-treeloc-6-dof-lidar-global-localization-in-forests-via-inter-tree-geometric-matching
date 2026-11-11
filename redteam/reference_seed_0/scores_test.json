@@ -1,0 +1,24 @@
+{
+  "experiments": {
+    "synthetic_forest_localization": {
+      "slice": "test",
+      "query_count": 24,
+      "artifact_paths": {
+        "reference_seed_0": "artifacts/reference_seed_0_results.json"
+      },
+      "results": {
+        "reference_seed_0": {
+          "R_at_1": 0.9166666666666666,
+          "F1": 0.6545454545454545,
+          "AUC": 0.6506440311753119,
+          "R_at_50": 0.7916666666666666,
+          "SR": 0.8636363636363636,
+          "TE_m": 0.036381097285263016,
+          "RE_deg": 0.2164662199147895,
+          "TE_all_m": 1.2233793451691832,
+          "RE_all_deg": 15.739712893923445
+        }
+      }
+    }
+  }
+}
