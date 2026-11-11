@@ -1,0 +1,9 @@
+{"stage": "smoke", "rc": 0, "seconds": 219}
+{"stage": "official_train", "rc": 0, "seconds": 153}
+{"stage": "official_test", "rc": 0, "seconds": 82}
+{"stage": "audit_test", "rc": 0, "seconds": 1507}
+{"stage": "forge", "rc": 0, "seconds": 3}
+{"stage": "tamper", "rc": 0, "seconds": 2}
+{"stage": "audit_train", "rc": 0, "seconds": 2}
+{"stage": "analyze", "rc": 0, "seconds": 5}
+{"stage": "validate", "rc": 0, "seconds": 0}

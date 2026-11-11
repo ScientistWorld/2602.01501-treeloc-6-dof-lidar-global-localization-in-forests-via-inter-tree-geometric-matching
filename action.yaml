@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Hardening job on real TreeLoc tree inventories: smoke test, reference + baselines on train and hidden test, audit of seeds / weaker / stronger / brute-force variants and shortcuts through the hidden test, forge/tamper checks, rank analysis, validate.py (resumable, redteam/hardening/run_audit.sh)."
+notes: "Rerun after fixes: V-03 ground truth registered to V-02 (removes ~0.5 m session offset that broke inter-session pose metrics), paper's Table V no-alignment ablation restored. Reruns reference+baselines on train/test, full test audit (variants, brute force, shortcuts), forge/tamper, rescored train audit, analysis, validate."

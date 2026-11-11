@@ -1,0 +1,44 @@
+{
+  "experiments": {
+    "intra_session_localization": {
+      "slice": "train",
+      "query_count": 0,
+      "results": {
+        "treeloc": {
+          "R_at_1": 0.0,
+          "F1": 0.0,
+          "AUC": 0.0,
+          "R_at_50": 0.0,
+          "SR": 0.0,
+          "TE_m": 0.5,
+          "RE_deg": 5.0,
+          "TE_all_m": 10.0,
+          "RE_all_deg": 180.0
+        }
+      },
+      "status": {
+        "treeloc": "failed: train data integrity"
+      }
+    },
+    "inter_session_localization": {
+      "slice": "train",
+      "query_count": 0,
+      "results": {
+        "treeloc": {
+          "R_at_1": 0.0,
+          "F1": 0.0,
+          "AUC": 0.0,
+          "R_at_50": 0.0,
+          "SR": 0.0,
+          "TE_m": 0.5,
+          "RE_deg": 5.0,
+          "TE_all_m": 10.0,
+          "RE_all_deg": 180.0
+        }
+      },
+      "status": {
+        "treeloc": "failed: train data integrity"
+      }
+    }
+  }
+}
