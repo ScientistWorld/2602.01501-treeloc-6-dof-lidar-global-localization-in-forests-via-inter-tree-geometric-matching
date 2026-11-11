@@ -1,0 +1,18 @@
+{
+  "start_commit": "f3e63f83d16b71a57e10a260b09cd3afd275702a",
+  "scientific_paths_checked": [
+    "baseline",
+    "briefing",
+    "data",
+    "environment",
+    "eval",
+    "method",
+    "scoring",
+    "scripts"
+  ],
+  "changed_scientific_paths": [],
+  "evaluator_unchanged_in_all_23_runs": true,
+  "temporary_run_script_restored": true,
+  "initial_dirty_paths_preserved": "README.md, manifest.json, trajectory/turn_0001_raw.jsonl through turn_0008_raw.jsonl",
+  "control_file_exception": "action.yaml is the required completion signal"
+}

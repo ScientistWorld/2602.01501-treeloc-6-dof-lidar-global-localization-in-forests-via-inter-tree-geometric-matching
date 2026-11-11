@@ -1,4 +1,2 @@
-action: submit
-gpus: 0
-test: false
-notes: "TreeLoc audit: three reference seeds, genuine stronger/weaker methods, exhaustive candidate search, and major scoring shortcuts; saves per-run hidden-test scores and restores mutable inputs."
+action: done
+notes: "Audit complete: genuine improvement rewarded, seed spread zero; six shortcuts beat reference in both audit populations, two tie, and one wins conditionally. Report and 23 run records committed; original scientific files restored."

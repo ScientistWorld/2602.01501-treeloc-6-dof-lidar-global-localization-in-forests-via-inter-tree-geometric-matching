@@ -39,6 +39,15 @@ def identity():
     return [[float(i == j) for j in range(4)] for i in range(4)]
 
 
+def cached_reference(data):
+    """Reuse the visible reference, or build it for a standalone shortcut run."""
+    path = CACHE / 'reference_results.json'
+    if not path.exists():
+        model = load_module(ROOT / 'redteam/reference/treeloc.py', 'audit_treeloc')
+        write(path, model.run_treeloc(data, 100, 10, True, True))
+    return read(path)
+
+
 def serial(name):
     return int(name.rsplit('_', 1)[1])
 
@@ -244,7 +253,7 @@ def run(name, seed):
     elif name in ('shortcut_scaled_rotation', 'shortcut_duplicate_pairs',
                   'shortcut_artifact_replay', 'shortcut_manifest_omission',
                   'shortcut_missing_artifact'):
-        result = read(CACHE / 'reference_results.json')
+        result = cached_reference(data)
         if name == 'shortcut_scaled_rotation':
             for pred in result['predictions']:
                 pred['estimated_query_to_candidate']['rotation'] = [
@@ -276,7 +285,7 @@ def run(name, seed):
             for pair in result['pair_scores']:
                 pair['score'] = None
     elif name == 'shortcut_nan_translation':
-        result = read(CACHE / 'reference_results.json')
+        result = cached_reference(data)
         # Make only translations non-finite. JSON accepts NaN by default.
         for pred in result['predictions']:
             pred['estimated_query_to_candidate']['translation'] = [float('nan')] * 3

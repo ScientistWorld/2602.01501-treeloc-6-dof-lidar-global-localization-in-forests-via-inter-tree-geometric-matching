@@ -1,0 +1,11 @@
+{
+  "artifacts_on_disk_before_no_argument_test": [
+    "artifacts/unscored_failing_method_results.json",
+    "artifacts/shortcut_manifest_omission_results.json"
+  ],
+  "methods_written_under_results": [
+    "shortcut_manifest_omission"
+  ],
+  "unscored_failing_method_present_on_disk": true,
+  "unscored_failing_method_absent_from_results": true
+}

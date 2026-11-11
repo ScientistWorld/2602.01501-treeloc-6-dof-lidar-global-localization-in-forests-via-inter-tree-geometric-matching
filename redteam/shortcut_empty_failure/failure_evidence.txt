@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/user/eval/test/evaluate.py", line 269, in <module>
+    main()
+  File "/home/user/eval/test/evaluate.py", line 249, in main
+    results[name] = evaluate_one(data, Path(path))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/test/evaluate.py", line 173, in evaluate_one
+    validate_complete_artifact(data, result, result_path)
+  File "/home/user/eval/test/evaluate.py", line 150, in validate_complete_artifact
+    raise ValueError(
+ValueError: artifacts/shortcut_empty_failure_results.json: predictions must contain exactly one top prediction per query; missing=['query_000', 'query_001', 'query_002', 'query_003', 'query_004', 'query_005', 'query_006', 'query_007', 'query_008', 'query_009', 'query_010', 'query_011', 'query_012', 'query_013', 'query_014', 'query_015', 'query_016', 'query_017', 'query_018', 'query_019', 'query_020', 'query_021', 'query_022', 'query_023', 'query_024', 'query_025', 'query_026', 'query_027', 'query_028', 'query_029', 'query_030', 'query_031', 'query_032', 'query_033', 'query_034', 'query_035', 'query_036', 'query_037', 'query_038', 'query_039', 'query_040', 'query_041', 'query_042', 'query_043', 'query_044', 'query_045', 'query_046', 'query_047', 'query_048', 'query_049', 'query_050', 'query_051', 'query_052', 'query_053', 'query_054', 'query_055'], duplicates=[]

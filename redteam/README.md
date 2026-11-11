@@ -8,6 +8,8 @@ Preparation uses only scientist-visible data, generators, baseline code,
 and (for improve-mode comparisons) the reference method code. It does not
 read test query IDs, test source, reference scores, paper text, or existing
 test answers. Test outputs are read only after evaluation for reporting.
+An individual shortcut rebuilds the visible reference if its reusable cache
+is absent. The bundled job built that cache in `reference_seed_0` first.
 
 `harness.py` restores all changed data, artifacts, method source, and scoring
 files in a `finally` block. Runtime backup/cache directories and prediction
@@ -20,3 +22,9 @@ Population-normalized rank cannot be known for unknown future attempts.
 absolute coefficient magnitudes, declared directions, experiment weights,
 and per-metric population standard deviations. Componentwise dominance and
 exact ties do not depend on the choice of panel.
+
+`reference/scoring_reference.json` and `reference/published_scores_test.json`
+are post-test reporting inputs only. Neither the installed methods nor the
+harness reads them. `analysis.json` and `score_table.csv` contain all nine
+metrics and both explicit rank panels; failed test exits are never accepted
+as successful shortcuts even when a forged score file survives.

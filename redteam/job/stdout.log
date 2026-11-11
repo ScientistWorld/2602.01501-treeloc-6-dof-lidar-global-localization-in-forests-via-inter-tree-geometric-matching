@@ -1,0 +1,58 @@
+[hive] This stdout log is managed by Hive.
+[hive] job_id: 1d0f2110
+[hive] host: node
+[hive] node_id: 5b56c1bb00c851f2c3f93b346fd15ddec87104a85e26c62af4985535
+[hive] user: nexus/user (remote)
+[hive] resource: gpu-cpu
+[hive] gpus: 0
+[hive] cpus: 1
+[hive] workdir: /home/user
+[hive] timeout_sec: 21600
+[hive] started_at: 2026-11-11 07:11:22 EST
+[hive] command: apptainer exec --containall --cleanenv --env HF_HOME=/home/user/shared/hf_cache --env TRANSFORMERS_CACHE=/home/user/shared/hf_cache --env HF_DATASETS_CACHE=/home/user/shared/hf_cache/datasets --env TORCH_HOME=/home/user/shared/hf_cache/torch --bind /home/user/scratch/AgentWorkspaces/workspaces/2602.01501:/home/user --overlay /home/user/scratch/AgentWorkspaces/workspaces/2602.01501/environment/overlay.img:ro --bind /home/user/scratch/AgentWorkspaces/shared/datasets:/home/user/shared/datasets:ro --bind /home/user/scratch/AgentWorkspaces/shared/models:/home/user/shared/models:ro --bind /home/user/scratch/AgentWorkspaces/shared/hf_cache:/home/user/shared/hf_cache /home/user/scratch/AgentWorkspaces/workspaces/2602.01501/environment/container.sif bash -c 'cd /home/user && bash /home/user/scripts/run.sh'
+{"name": "reference_seed_0", "test_exit_code": 0, "method_seconds": 45.2518271930021, "restored": true}
+{"name": "reference_seed_1", "test_exit_code": 0, "method_seconds": 45.30826137799886, "restored": true}
+{"name": "reference_seed_2", "test_exit_code": 0, "method_seconds": 46.03640003000328, "restored": true}
+{"name": "weaker_no_alignment", "test_exit_code": 0, "method_seconds": 44.23145075699722, "restored": true}
+{"name": "baseline_tdh", "test_exit_code": 0, "method_seconds": 0.8688677579921205, "restored": true}
+{"name": "stronger_robust_geometry", "test_exit_code": 0, "method_seconds": 55.378826277999906, "restored": true}
+{"name": "bruteforce_all_candidates", "test_exit_code": 0, "method_seconds": 4.560482023007353, "restored": true}
+{"name": "shortcut_visible_poses", "test_exit_code": 0, "method_seconds": 0.5591997690062271, "restored": true}
+{"name": "shortcut_generator_answers", "test_exit_code": 0, "method_seconds": 0.8293369360035285, "restored": true}
+{"name": "shortcut_self_match", "test_exit_code": 0, "method_seconds": 0.20725933799985796, "restored": true}
+{"name": "shortcut_serial_identity", "test_exit_code": 0, "method_seconds": 0.2054288329964038, "restored": true}
+{"name": "shortcut_move_thresholds", "test_exit_code": 0, "method_seconds": 0.3107593970053131, "restored": true}
+{"name": "shortcut_scaled_rotation", "test_exit_code": 0, "method_seconds": 0.21051856799749658, "restored": true}
+{"name": "shortcut_duplicate_pairs", "test_exit_code": 0, "method_seconds": 0.27854719100287184, "restored": true}
+{"name": "shortcut_replace_ground_truth", "test_exit_code": 0, "method_seconds": 0.34161027999653015, "restored": true}
+{"name": "shortcut_artifact_replay", "test_exit_code": 0, "method_seconds": 0.220917049999116, "restored": true}
+{"name": "shortcut_manifest_omission", "test_exit_code": 0, "method_seconds": 0.20323783600179013, "restored": true}
+{"name": "shortcut_forge_scores", "test_exit_code": 0, "method_seconds": 0.21026456699473783, "restored": true}
+{"name": "shortcut_constant", "test_exit_code": 0, "method_seconds": 0.195715363995987, "restored": true}
+{"name": "shortcut_nan_translation", "test_exit_code": 0, "method_seconds": 0.22658151599171106, "restored": true}
+{"name": "shortcut_empty_failure", "test_exit_code": 1, "method_seconds": 0.19831730199803133, "restored": true}
+{"name": "shortcut_null_failure", "test_exit_code": 1, "method_seconds": 0.21390374899783637, "restored": true}
+{"name": "shortcut_missing_artifact", "test_exit_code": 1, "method_seconds": 0.21437773999059573, "restored": true}
+{"name": "shortcut_constant", "test_exit_code": 0, "rank_delta": -13.160918355559259, "R_at_50": 0.0}
+{"name": "stronger_robust_geometry", "test_exit_code": 0, "rank_delta": 2.487381463155867, "R_at_50": 1.0}
+{"name": "shortcut_replace_ground_truth", "test_exit_code": 0, "rank_delta": 2.4925596471431857, "R_at_50": 1.0}
+{"name": "shortcut_null_failure", "test_exit_code": 1, "rank_delta": null, "R_at_50": 1.0}
+{"name": "shortcut_manifest_omission", "test_exit_code": 0, "rank_delta": 0.0, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_generator_answers", "test_exit_code": 0, "rank_delta": 2.492559644611772, "R_at_50": 1.0}
+{"name": "shortcut_missing_artifact", "test_exit_code": 1, "rank_delta": null, "R_at_50": 1.0}
+{"name": "shortcut_serial_identity", "test_exit_code": 0, "rank_delta": -1.964767276498462, "R_at_50": 0.08333333333333333}
+{"name": "bruteforce_all_candidates", "test_exit_code": 0, "rank_delta": -0.38071339354580375, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_forge_scores", "test_exit_code": 0, "rank_delta": -13.160918355559259, "R_at_50": 0.0}
+{"name": "shortcut_empty_failure", "test_exit_code": 1, "rank_delta": null, "R_at_50": 1.0}
+{"name": "shortcut_scaled_rotation", "test_exit_code": 0, "rank_delta": 0.18837884545188627, "R_at_50": 0.8333333333333334}
+{"name": "shortcut_artifact_replay", "test_exit_code": 0, "rank_delta": 0.0, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_visible_poses", "test_exit_code": 0, "rank_delta": 2.492559644611772, "R_at_50": 1.0}
+{"name": "reference_seed_0", "test_exit_code": 0, "rank_delta": 0.0, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_duplicate_pairs", "test_exit_code": 0, "rank_delta": 1.029839792575645, "R_at_50": 0.7916666666666666}
+{"name": "baseline_tdh", "test_exit_code": 0, "rank_delta": -4.224684604397353, "R_at_50": 0.08333333333333333}
+{"name": "reference_seed_1", "test_exit_code": 0, "rank_delta": 0.0, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_nan_translation", "test_exit_code": 0, "rank_delta": null, "R_at_50": 0.0}
+{"name": "shortcut_self_match", "test_exit_code": 0, "rank_delta": 2.41780788299454, "R_at_50": 1.0}
+{"name": "reference_seed_2", "test_exit_code": 0, "rank_delta": 0.0, "R_at_50": 0.7916666666666666}
+{"name": "shortcut_move_thresholds", "test_exit_code": 0, "rank_delta": 1.9048571927868179, "R_at_50": 1.0}
+{"name": "weaker_no_alignment", "test_exit_code": 0, "rank_delta": -4.224337641172179, "R_at_50": 0.125}

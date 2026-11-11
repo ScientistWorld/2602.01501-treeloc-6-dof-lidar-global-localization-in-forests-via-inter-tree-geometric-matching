@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/user/eval/test/evaluate.py", line 269, in <module>
+    main()
+  File "/home/user/eval/test/evaluate.py", line 249, in main
+    results[name] = evaluate_one(data, Path(path))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/test/evaluate.py", line 184, in evaluate_one
+    scores = [float(p["score"]) for p in pair_scores]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/test/evaluate.py", line 184, in <listcomp>
+    scores = [float(p["score"]) for p in pair_scores]
+              ^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
