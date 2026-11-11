@@ -9,8 +9,8 @@
 # Disk after processing: ~19 MB (data/train/ ~10 MB, eval/test/data/ ~9 MB).
 #
 # Idempotent: each processed file set is rebuilt only if a file is missing.
-# The raw checkout is placed in a temporary directory outside the workspace and
-# removed, because its trajectories include the hidden test answers; only
+# The raw checkout is placed in a temporary directory (gitignored) and removed
+# on exit, because its trajectories include the hidden test answers; only
 # eval/test/prepare_test_data.py writes the test side, into eval/test/data/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -34,7 +34,10 @@ if [ "$need_train" = 0 ] && [ "$need_test" = 0 ]; then
   exit 0
 fi
 
-WORK="$(mktemp -d)"
+# Scratch checkout in the gitignored data/downloads/ (system /tmp can be tiny);
+# it is deleted on exit, so the raw trajectories never stay in the workspace.
+mkdir -p data/downloads
+WORK="$(mktemp -d "$PWD/data/downloads/.treeloc_fetch.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 git init -q "$WORK/treeloc"
 git -C "$WORK/treeloc" remote add origin "$UPSTREAM_URL"

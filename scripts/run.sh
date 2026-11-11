@@ -1,28 +1,8 @@
 #!/bin/bash
-# Regenerate the deterministic benchmark and all standard TreeLoc-format
-# artifacts, then score the formal and split evaluation suites.
-
+# Iteration-11 hardening job: reproduces the reference end to end (TreeLoc and
+# the baselines on the train slice and on the hidden test, i.e. what
+# scripts/reproduce.sh does) and then runs the hardening audit (variants and
+# shortcuts through the hidden test). Resumable; see redteam/hardening/run_audit.sh.
 set -euo pipefail
-
 cd /home/user
-
-mkdir -p artifacts data scoring
-
-python data/generate_synthetic_forest.py --output data/forest_scenes.json --seed 11
-python baseline/tdh_baseline.py \
-  --data data/forest_scenes.json \
-  --output artifacts/tdh_baseline_results.json
-python method/treeloc.py \
-  --data data/forest_scenes.json \
-  --output artifacts/treeloc_results.json
-python method/treeloc.py \
-  --data data/forest_scenes.json \
-  --output artifacts/treeloc_no_alignment_results.json \
-  --no-alignment
-
-bash scripts/evaluate.sh
-bash scripts/evaluate_train.sh
-bash scripts/evaluate_test.sh
-
-python validate.py --compare
-python validate.py --post-reproducer
+bash redteam/hardening/run_audit.sh

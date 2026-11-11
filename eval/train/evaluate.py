@@ -9,7 +9,8 @@ the visible train inputs in ``data/train/`` and scored against
 ``data/train/truth.json.gz`` (whose contents are integrity-checked here).
 
 Invalid, missing or crashed outputs get the worst value of every metric of
-that experiment. Raw outputs and per-query diagnostics are kept under
+that experiment. Other score files in ``scoring/`` and the train benchmark
+files are restored afterwards if a submission changed them. Raw outputs and per-query diagnostics are kept under
 ``artifacts/train_outputs/<name>/`` for development.
 
 Usage: python eval/train/evaluate.py [--output scoring/scores_train.json] [method ...]
@@ -340,6 +341,39 @@ def run_one(name: str, script: Path | None, exp: str, payload_bytes: bytes, payl
         shutil.rmtree(work, ignore_errors=True)
 
 
+
+def snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    """Bytes of files a submission must not change (other score files, benchmark data)."""
+    snap = {}
+    for p in paths:
+        try:
+            snap[p] = p.read_bytes() if p.is_file() else None
+        except OSError:
+            snap[p] = None
+    return snap
+
+
+def restore_files(snap: dict[Path, bytes | None]) -> None:
+    """Undo any change a submission made to the snapshotted files while it ran."""
+    for p, content in snap.items():
+        try:
+            current = p.read_bytes() if p.is_file() else None
+        except OSError:
+            current = None
+        if current == content:
+            continue
+        print(f"[{SLICE}] {p} was modified while submissions ran; restoring it", file=sys.stderr)
+        try:
+            if content is None:
+                p.unlink()
+            else:
+                tmp = p.with_name(p.name + ".restore")
+                tmp.write_bytes(content)
+                os.replace(tmp, p)
+        except OSError as exc:
+            print(f"[{SLICE}] could not restore {p}: {exc}", file=sys.stderr)
+
+
 def write_scores(path: Path, results: dict, status: dict, counts: dict) -> None:
     payload = {"experiments": {}}
     for exp in EXPERIMENTS:
@@ -416,10 +450,20 @@ def main() -> int:
         except Exception as exc:  # never let one method break the others
             return task, (dict(WORST), f"failed: evaluator error {type(exc).__name__}: {exc}")
 
-    with ThreadPoolExecutor(max_workers=jobs) as pool:
-        for (name, _script, exp), (metrics, state) in pool.map(work, tasks):
-            results[name][exp] = metrics
-            status[name][exp] = state
+    # Submissions run with the workspace as their working directory. Score
+    # files other than this run's output and the benchmark files are restored
+    # afterwards if a submission changed them (truth is already in memory).
+    guarded = [ROOT / "scoring" / n for n in ("scores.json", "scores_train.json", "scores_test.json")]
+    guarded = [p for p in guarded if p.resolve() != out_path.resolve()]
+    guarded += [DATA_DIR / n for n in EXPECTED_SHA256] + [DATA_DIR / "SHA256SUMS.json"]
+    snapshot = snapshot_files(guarded)
+    try:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            for (name, _script, exp), (metrics, state) in pool.map(work, tasks):
+                results[name][exp] = metrics
+                status[name][exp] = state
+    finally:
+        restore_files(snapshot)
 
     write_scores(out_path, results, status, counts)
     print(json.dumps({exp: {n: results[n][exp] for n in sorted(results)} for exp in EXPERIMENTS}, indent=2))

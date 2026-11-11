@@ -92,7 +92,15 @@ def read_hidden(payload: dict, inp: str) -> list[dict]:
     """Look for any file outside eval/test that mentions the input query IDs."""
     ids = [q["id"] for seq in payload["sequences"] for q in seq["queries"]][:20]
     hits = []
-    for path in ROOT.rglob("*"):
+    skip_top = {".git", "shared", "environment", "jobs", "tmp", ".claude", ".codex", "trajectory"}
+    paths = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        rel_dir = Path(dirpath).relative_to(ROOT).as_posix()
+        if rel_dir == ".":
+            dirnames[:] = [d for d in dirnames if d not in skip_top]
+        dirnames[:] = [d for d in dirnames if not f"{rel_dir}/{d}".startswith(("eval/test", "./eval/test"))]
+        paths += [Path(dirpath) / f for f in filenames]
+    for path in paths:
         rel = path.relative_to(ROOT).as_posix()
         if not path.is_file() or rel.startswith(("eval/test/", ".git/")) or path.stat().st_size > 50_000_000:
             continue

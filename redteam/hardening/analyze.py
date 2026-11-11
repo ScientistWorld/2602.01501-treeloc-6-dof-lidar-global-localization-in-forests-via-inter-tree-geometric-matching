@@ -79,15 +79,27 @@ def rank_delta(vals: dict, ref: dict, ref_json: dict, stds: dict) -> float:
 
 
 def main() -> None:
-    scores_path = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "audit_scores_test.json"
-    details_dir = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "details_test"
-    out_path = Path(sys.argv[3]) if len(sys.argv) > 3 else HERE / "analysis_test.json"
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--scores", nargs="+", required=True, help="score files; later files override earlier ones per method")
+    ap.add_argument("--details", default=None, help="per-query details dir (TREELOC_DETAILS_DIR) for the paired bootstrap")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--exclude", nargs="*", default=[], help="method names to leave out")
+    a = ap.parse_args()
+    out_path = Path(a.out)
+    details_dir = Path(a.details) if a.details else None
     ref_json = json.loads((ROOT / "scoring" / "reference.json").read_text())
-    scores = json.loads(scores_path.read_text())["experiments"]
     exps = list(ref_json["experiments"])
-    names = sorted(scores[exps[0]]["results"])
-    vals = {n: {e: scores[e]["results"][n] for e in exps} for n in names}
-    status = {n: {e: scores[e].get("status", {}).get(n, "?") for e in exps} for n in names}
+    vals, status = {}, {}
+    for path in a.scores:
+        scores = json.loads(Path(path).read_text())["experiments"]
+        for n in scores[exps[0]]["results"]:
+            if n in a.exclude:
+                continue
+            vals[n] = {e: scores[e]["results"][n] for e in exps}
+            status[n] = {e: scores[e].get("status", {}).get(n, "?") for e in exps}
+    names = sorted(vals)
     honest = [n for n in names if not n.startswith("shortcut_") and all(s == "ok" for s in status[n].values())]
     panels = {"Q": honest, "A": names}
     stds = {p: {e: {m: float(np.std([vals[n][e][m] for n in members])) for m in ref_json["experiments"][e]["metrics"]} for e in exps}
@@ -98,7 +110,7 @@ def main() -> None:
                                 "rank_delta": {p: rank_delta(vals[n], vals[REF], ref_json, stds[p]) for p in panels}}
 
     # Paired bootstrap of the rank delta over test queries (normalisation from panel Q).
-    det = {n: {e: load_details(details_dir, n, e) for e in exps} for n in names}
+    det = {n: {e: (load_details(details_dir, n, e) if details_dir else None) for e in exps} for n in names}
     ref_det = det[REF]
     if all(ref_det[e] is not None for e in exps):
         rng = np.random.default_rng(12345)

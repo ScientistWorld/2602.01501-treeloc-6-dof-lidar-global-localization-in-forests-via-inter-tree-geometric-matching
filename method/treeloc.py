@@ -206,10 +206,12 @@ def make_scene(frame: dict, f: dict, use_alignment: bool = True, use_dbh: bool =
         dtype=float,
     ).reshape(-1, 10)
     g = {"reconstructed": 8, "number_clusters": 9, "score": 7}
+    # Released-code order (ProcessFile): the alignment uses the reconstructed
+    # stems inside the raw 60 m box; tree selection runs on all (aligned) trees
+    # and the 60 m box crop is applied to the aligned positions afterwards.
     in_box = (np.abs(raw[:, 0]) <= BOX_HALF_WIDTH_M) & (np.abs(raw[:, 1]) <= BOX_HALF_WIDTH_M)
-    raw = raw[in_box]
     rec = raw[:, 8] == 1
-    align = axis_alignment(raw[rec, 3:6]) if use_alignment else np.eye(3)
+    align = axis_alignment(raw[rec & in_box, 3:6]) if use_alignment else np.eye(3)
     pos = raw[:, 0:3] @ align.T
     sel = select_trees(raw, g)
     if len(sel):
