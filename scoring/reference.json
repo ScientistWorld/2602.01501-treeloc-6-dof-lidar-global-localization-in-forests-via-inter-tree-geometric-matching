@@ -103,10 +103,10 @@
           "RE_deg": 1.953
         }
       },
-      "_notes": "results.treeloc / results.btc are the paper's Oxford Stein numbers (Table I place recognition; Table III 3-DoF localization), kept unchanged. results.treeloc_no_alignment is Table V (Stein, 100 TDH candidates, DBH, no alignment). Protocol differences: the gym uses a fixed time split (database = first 50% of Stein frames) instead of every earlier frame, 6-DoF rather than 3-DoF errors, and recall over all evaluated queries for F1/AUC (the released code counts a wrong but rejected top-1 as a true negative), so the paper's F1/AUC are not directly comparable (here F1 <= 2 R@1 / (1 + R@1))."
+      "_notes": "results.treeloc / results.btc are the paper's Oxford Stein numbers (Table I place recognition; Table III 3-DoF localization), kept unchanged. results.treeloc_no_alignment is Table V (Stein, 100 TDH candidates, DBH, no alignment). Protocol differences: the gym uses a fixed time split (database = first 50% of Stein frames) instead of every earlier frame, 6-DoF rather than 3-DoF errors, and recall over all evaluated queries for F1/AUC (the released code counts a wrong but rejected top-1 as a true negative), so the paper's F1/AUC are not directly comparable (here F1 <= 2 R@1 / (1 + R@1)). results.treeloc_no_alignment follows the paper's Table V ablation: TDH and triangle hashes are built from raw (unaligned) stem centres while verification and the 6-DoF pose use the aligned scene; Table V's R@50 for the full method (0.908) equals Table III's 6-DoF value, so its R@50 column is read as 6-DoF."
     },
     "inter_session_localization": {
-      "description": "Inter-session (temporal change, ~6 months) forest place recognition and 6-DoF localization on the authors' tree inventories of Wild-Places Venman: queries from V-03, database from V-02. Hidden test: the official Wild-Places Venman test regions. Train: frames at least 50 m outside those regions.",
+      "description": "Inter-session (temporal change, ~6 months) forest place recognition and 6-DoF localization on the authors' tree inventories of Wild-Places Venman: queries from V-03, database from V-02. Hidden test: the official Wild-Places Venman test regions. Train: frames at least 50 m outside those regions. Ground truth: the released V-03 trajectory is offset from V-02 by about 0.5 m (world frame), so each V-03 position is registered to the V-02 frame by stem-map alignment before relative poses are formed (see eval/test/prepare_test_data.py, session_registration_offsets); rotations are unchanged.",
       "weight": 0.4,
       "primary_metric": "R_at_1",
       "metrics": {
@@ -176,7 +176,7 @@
           "type": "baseline"
         }
       },
-      "_notes": "results are the paper's Table II Wild-Places Venman inter-session means over 12 query-database pairs (the gym uses the V-03 -> V-02 pair only). The paper reports no inter-session localization accuracy. F1/AUC use recall over all evaluated queries (see intra_session_localization._notes)."
+      "_notes": "results are the paper's Table II Wild-Places Venman inter-session means over 12 query-database pairs (the gym uses the V-03 -> V-02 pair only). The paper reports no inter-session localization accuracy; R_at_50, SR, TE_m, RE_deg, TE_all_m, RE_all_deg are gym additions scored against the registered ground truth (without the registration every method's inter-session poses were ~0.5 m off and R_at_50 measured the dataset offset). F1/AUC use recall over all evaluated queries (see intra_session_localization._notes)."
     }
   }
 }

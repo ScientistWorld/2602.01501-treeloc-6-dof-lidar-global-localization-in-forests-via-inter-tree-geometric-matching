@@ -39,7 +39,7 @@ EXPERIMENTS = ("intra_session_localization", "inter_session_localization")
 EXPECTED_SHA256 = {
     "inter_session_localization.input.json.gz": "b4c41a79cfc6e2ce80dbbc7f5e62db5496c7765fc0f51dc9a04e580e3a48c31d",
     "intra_session_localization.input.json.gz": "1bba828dd42d1206938e5d995a3daa2067448a990dbab714678df79d9547e354",
-    "truth.json.gz": "e7280d0b1ae439ebe09685e0f5e428592bd112a5a080e8f1a4a2faf60457a993",
+    "truth.json.gz": "fc3791097b3e93a51a3cbcd63764d88fb8d9e330bee0d4c7e035cba12f6b7fed",
 }
 
 # Operating points (fixed here, never read from data or method output).

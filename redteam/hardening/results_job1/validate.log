@@ -1,0 +1,46 @@
+── Scoring ──
+  reference.json — OK (2 experiments, 8 methods)
+  scores.json — OK (1 experiments, 2 methods)
+  scores_train.json — OK (1 experiments, 2 methods)
+  scores_test.json — OK (1 experiments, 2 methods)
+
+── Structure ──
+  import separation — OK (eval/ and data/ do not import from method/)
+  eval reads method outputs — OK (no regen-without-read pattern)
+  gitignored imports — OK (all eval/method/baseline imports resolve to tracked files)
+  eval/train ↔ eval/test independence — OK
+  shared/ references — OK (no shared/ paths in committed code)
+  evaluate_{train,test}.sh rewiring — OK
+  evaluate_{train,test}.sh method defaults — OK (no hardcoded method name)
+  scores_train.json ↔ scores_test.json method keys — OK
+  scores_train.json ↔ scores_test.json value differentiation — OK
+  primary metric train/test differentiation — OK
+  primary metric discriminates methods on train — OK
+
+All checks passed.
+---- --post-design
+── Scoring ──
+  reference.json — OK (2 experiments, 8 methods)
+  scores.json — OK (1 experiments, 2 methods)
+  scores_train.json — OK (1 experiments, 2 methods)
+  scores_test.json — OK (1 experiments, 2 methods)
+  split-mode artifacts — OK (all 6 present)
+  scores ↔ paper consistency — 3 error(s):
+    ✗ scores.json: experiments.intra_session_localization.treeloc_no_alignment: primary metric 'R_at_50' — paper reports 0.701 but scores.json has 0.3217993079584775 (2.18x off in magnitude, absolute gap 0.38). This gap is too large to accept — one of the two sides is wrong. Either the value in scores.json is wrong (broken training, wrong data split, missing preprocessing, wrong unit, etc.) OR the paper-reported value in reference.json is wrong (reference.json was written by an earlier agent and is not verified). Fix whichever is off — edit either scores.json (re-run the method) or reference.json (correct the transcribed value). Re-read the paper if you are sure your reproduction is good. Do not claim the milestone until this experiment's numbers are consistent.
+    ✗ scores_train.json: experiments.intra_session_localization.treeloc_no_alignment: primary metric 'R_at_50' — paper reports 0.701 but scores_train.json has 0.3217993079584775 (2.18x off in magnitude, absolute gap 0.38). This gap is too large to accept — one of the two sides is wrong. Either the value in scores_train.json is wrong (broken training, wrong data split, missing preprocessing, wrong unit, etc.) OR the paper-reported value in reference.json is wrong (reference.json was written by an earlier agent and is not verified). Fix whichever is off — edit either scores_train.json (re-run the method) or reference.json (correct the transcribed value). Re-read the paper if you are sure your reproduction is good. Do not claim the milestone until this experiment's numbers are consistent.
+    ✗ scores_test.json: experiments.intra_session_localization.treeloc_no_alignment: primary metric 'R_at_50' — paper reports 0.701 but scores_test.json has 0.22095671981776766 (3.17x off in magnitude, absolute gap 0.48). This gap is too large to accept — one of the two sides is wrong. Either the value in scores_test.json is wrong (broken training, wrong data split, missing preprocessing, wrong unit, etc.) OR the paper-reported value in reference.json is wrong (reference.json was written by an earlier agent and is not verified). Fix whichever is off — edit either scores_test.json (re-run the method) or reference.json (correct the transcribed value). Re-read the paper if you are sure your reproduction is good. Do not claim the milestone until this experiment's numbers are consistent.
+
+── Structure ──
+  import separation — OK (eval/ and data/ do not import from method/)
+  eval reads method outputs — OK (no regen-without-read pattern)
+  gitignored imports — OK (all eval/method/baseline imports resolve to tracked files)
+  eval/train ↔ eval/test independence — OK
+  shared/ references — OK (no shared/ paths in committed code)
+  evaluate_{train,test}.sh rewiring — OK
+  evaluate_{train,test}.sh method defaults — OK (no hardcoded method name)
+  scores_train.json ↔ scores_test.json method keys — OK
+  scores_train.json ↔ scores_test.json value differentiation — OK
+  primary metric train/test differentiation — OK
+  primary metric discriminates methods on train — OK
+
+FAILED — fix the errors above.

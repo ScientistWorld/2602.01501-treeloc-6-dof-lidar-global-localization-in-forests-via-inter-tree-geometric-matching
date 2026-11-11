@@ -11,7 +11,8 @@
 #   audit_test     every variant/shortcut in submissions_audit/ on the hidden test
 #   forge          score-forging submissions (score files must be restored)
 #   tamper         truth-tampering submission (truth must be restored / detected)
-#   audit_train    selected variants on the train slice (train/test consistency)
+#   audit_train    selected variants on the train slice (train/test consistency;
+#                  saved outputs are rescored when only the truth changed)
 #   analyze        rank deltas (two panels) + paired bootstrap on test queries
 #   validate       python validate.py (default and --post-design)
 set -uo pipefail
@@ -111,8 +112,18 @@ tamper() {
 }
 
 audit_train() {
-  TREELOC_SUBMISSIONS_DIR=$H/submissions_audit TREELOC_METHOD_TIMEOUT_S=5400 python eval/train/evaluate.py \
-    --output "$OUT/audit_scores_train.json" stronger_robust_tilt stronger_robust weaker_treeloc_f bruteforce_exhaustive
+  # Job 1 ran these variants on the train slice and saved their outputs in
+  # artifacts/train_outputs/; their code and inputs are unchanged since, only
+  # the train truth was corrected, so the saved outputs are rescored.
+  local n missing=()
+  for n in stronger_robust_tilt stronger_robust weaker_treeloc_f bruteforce_exhaustive; do
+    [ -f "artifacts/train_outputs/$n/intra_session_localization.json" ] && [ -f "artifacts/train_outputs/$n/inter_session_localization.json" ] || missing+=("$n")
+  done
+  if [ ${#missing[@]} -gt 0 ]; then
+    TREELOC_SUBMISSIONS_DIR=$H/submissions_audit TREELOC_METHOD_TIMEOUT_S=5400 python eval/train/evaluate.py \
+      --output "$OUT/audit_scores_train_rerun.json" "${missing[@]}" || return 1
+  fi
+  python $H/rescore_saved.py "$OUT/audit_scores_train.json" stronger_robust_tilt stronger_robust weaker_treeloc_f bruteforce_exhaustive
 }
 
 analyze() {

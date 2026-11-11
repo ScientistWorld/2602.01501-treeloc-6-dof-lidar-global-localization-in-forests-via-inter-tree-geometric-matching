@@ -1,0 +1,558 @@
+[test] ablation_no_tdh/intra_session_localization ok in 22.2s: R_at_1=0.7654, F1=0.8024, AUC=0.7450, R_at_50=0.8656, SR=0.9226, TE_m=0.1225, RE_deg=0.7412, TE_all_m=0.7084, RE_all_deg=6.0580
+[test] ablation_no_tdh/inter_session_localization ok in 51.9s: R_at_1=0.6880, F1=0.7005, AUC=0.6285, R_at_50=0.2482, SR=0.3342, TE_m=0.4151, RE_deg=1.2894, TE_all_m=3.2646, RE_all_deg=24.3995
+[test] bruteforce_exhaustive/intra_session_localization ok in 68.2s: R_at_1=0.7973, F1=0.8091, AUC=0.7668, R_at_50=0.9339, SR=0.9457, TE_m=0.1261, RE_deg=0.7801, TE_all_m=0.2969, RE_all_deg=1.9046
+[test] bruteforce_exhaustive/inter_session_localization ok in 177.4s: R_at_1=0.6588, F1=0.7170, AUC=0.6219, R_at_50=0.3175, SR=0.4127, TE_m=0.4203, RE_deg=1.3033, TE_all_m=2.7385, RE_all_deg=22.4797
+[test] shortcut_artifact_replay/intra_session_localization invalid output: unknown query id 'f117a30d15d1a'
+[test] shortcut_artifact_replay/inter_session_localization invalid output: unknown query id 'f61ab0a41c21c'
+[test] shortcut_constant/intra_session_localization ok in 0.3s: R_at_1=0.0000, F1=0.0000, AUC=0.0000, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=10.0000, RE_all_deg=93.5276
+[test] shortcut_constant/inter_session_localization ok in 0.6s: R_at_1=0.0164, F1=0.0164, AUC=0.0003, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.9179, RE_all_deg=106.7331
+[test] shortcut_crash/intra_session_localization exited 1; log tail:
+
+[test] shortcut_crash/inter_session_localization exited 1; log tail:
+
+[test] shortcut_duplicate_predictions/intra_session_localization invalid output: duplicate prediction for query f4924ef36e2c9
+[test] shortcut_duplicate_predictions/inter_session_localization invalid output: duplicate prediction for query f06cf6594fecc
+[test] shortcut_nan_translation/intra_session_localization invalid output: translation for query f4924ef36e2c9 must be 3 finite numbers
+[test] shortcut_nan_translation/inter_session_localization invalid output: translation for query f06cf6594fecc must be 3 finite numbers
+[test] shortcut_ordinal/intra_session_localization ok in 0.3s: R_at_1=0.0774, F1=0.0774, AUC=0.0060, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.6739, RE_all_deg=92.3498
+[test] shortcut_ordinal/inter_session_localization ok in 0.6s: R_at_1=0.0073, F1=0.0073, AUC=0.0001, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.9600, RE_all_deg=99.4749
+[test] shortcut_read_hidden/intra_session_localization ok in 2.5s: R_at_1=0.0000, F1=0.0000, AUC=0.0000, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=10.0000, RE_all_deg=93.5276
+[test] shortcut_read_hidden/inter_session_localization ok in 1.7s: R_at_1=0.0164, F1=0.0164, AUC=0.0003, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.9179, RE_all_deg=106.7331
+[test] shortcut_rotation_scale_huge/intra_session_localization invalid output: rotation for query f4924ef36e2c9 is not a proper rotation matrix
+[test] shortcut_rotation_scale_huge/inter_session_localization invalid output: rotation for query f06cf6594fecc is not a proper rotation matrix
+[test] shortcut_rotation_scale_small/intra_session_localization invalid output: rotation for query f4924ef36e2c9 is not a proper rotation matrix
+[test] shortcut_rotation_scale_small/inter_session_localization invalid output: rotation for query f06cf6594fecc is not a proper rotation matrix
+[test] shortcut_self_match/intra_session_localization invalid output: candidate 'f4924ef36e2c9' for query f4924ef36e2c9 is not a database frame of its sequence
+[test] shortcut_self_match/inter_session_localization invalid output: candidate 'f06cf6594fecc' for query f06cf6594fecc is not a database frame of its sequence
+[test] shortcut_train_lookup/intra_session_localization ok in 2.2s: R_at_1=0.0000, F1=0.0000, AUC=0.0000, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=10.0000, RE_all_deg=93.5276
+[test] shortcut_train_lookup/inter_session_localization ok in 2.8s: R_at_1=0.0164, F1=0.0164, AUC=0.0003, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.9179, RE_all_deg=106.7331
+[test] stronger_robust/intra_session_localization ok in 67.8s: R_at_1=0.8519, F1=0.9095, AUC=0.8507, R_at_50=0.8907, SR=0.9519, TE_m=0.1192, RE_deg=0.7857, TE_all_m=0.7540, RE_all_deg=6.8152
+[test] stronger_robust/inter_session_localization ok in 66.8s: R_at_1=0.9799, F1=0.9890, AUC=0.9799, R_at_50=0.3887, SR=0.3948, TE_m=0.4398, RE_deg=1.1630, TE_all_m=0.6277, RE_all_deg=1.9745
+[test] stronger_robust_tilt/intra_session_localization ok in 54.0s: R_at_1=0.8519, F1=0.9095, AUC=0.8507, R_at_50=0.9043, SR=0.9626, TE_m=0.1195, RE_deg=0.4971, TE_all_m=0.7481, RE_all_deg=6.5441
+[test] stronger_robust_tilt/inter_session_localization ok in 65.6s: R_at_1=0.9799, F1=0.9890, AUC=0.9799, R_at_50=0.4142, SR=0.4209, TE_m=0.4393, RE_deg=0.3226, TE_all_m=0.6229, RE_all_deg=1.1127
+[test] tdh_baseline/intra_session_localization ok in 1.0s: R_at_1=0.4009, F1=0.4018, AUC=0.1648, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=7.3074, RE_all_deg=82.1473
+[test] tdh_baseline/inter_session_localization ok in 1.4s: R_at_1=0.3741, F1=0.3748, AUC=0.1507, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=7.5995, RE_all_deg=128.1789
+[test] treeloc/intra_session_localization ok in 14.2s: R_at_1=0.7585, F1=0.7905, AUC=0.7371, R_at_50=0.8793, SR=0.9339, TE_m=0.1215, RE_deg=0.7524, TE_all_m=0.6701, RE_all_deg=5.9245
+[test] treeloc/inter_session_localization ok in 25.3s: R_at_1=0.7993, F1=0.8000, AUC=0.7427, R_at_50=0.2646, SR=0.2991, TE_m=0.4139, RE_deg=1.3084, TE_all_m=2.4929, RE_all_deg=16.3689
+[test] treeloc_no_alignment/intra_session_localization ok in 12.8s: R_at_1=0.6219, F1=0.6869, AUC=0.5976, R_at_50=0.2210, SR=0.3223, TE_m=0.2190, RE_deg=2.8484, TE_all_m=3.3539, RE_all_deg=33.5483
+[test] treeloc_no_alignment/inter_session_localization ok in 24.7s: R_at_1=0.2464, F1=0.2495, AUC=0.1236, R_at_50=0.0036, SR=0.0148, TE_m=0.3886, RE_deg=3.2419, TE_all_m=8.4142, RE_all_deg=72.7280
+[test] treeloc_seed1/intra_session_localization ok in 15.5s: R_at_1=0.7585, F1=0.7905, AUC=0.7371, R_at_50=0.8793, SR=0.9339, TE_m=0.1215, RE_deg=0.7524, TE_all_m=0.6701, RE_all_deg=5.9245
+[test] treeloc_seed1/inter_session_localization ok in 28.1s: R_at_1=0.7993, F1=0.8000, AUC=0.7427, R_at_50=0.2646, SR=0.2991, TE_m=0.4139, RE_deg=1.3084, TE_all_m=2.4929, RE_all_deg=16.3689
+[test] treeloc_seed2/intra_session_localization ok in 14.9s: R_at_1=0.7585, F1=0.7905, AUC=0.7371, R_at_50=0.8793, SR=0.9339, TE_m=0.1215, RE_deg=0.7524, TE_all_m=0.6701, RE_all_deg=5.9245
+[test] treeloc_seed2/inter_session_localization ok in 39.1s: R_at_1=0.7993, F1=0.8000, AUC=0.7427, R_at_50=0.2646, SR=0.2991, TE_m=0.4139, RE_deg=1.3084, TE_all_m=2.4929, RE_all_deg=16.3689
+[test] weaker_no_dbh/intra_session_localization ok in 18.3s: R_at_1=0.7517, F1=0.7839, AUC=0.7319, R_at_50=0.8474, SR=0.9182, TE_m=0.1165, RE_deg=0.7875, TE_all_m=0.8422, RE_all_deg=6.6018
+[test] weaker_no_dbh/inter_session_localization ok in 24.2s: R_at_1=0.7464, F1=0.7479, AUC=0.6948, R_at_50=0.2500, SR=0.3032, TE_m=0.4162, RE_deg=1.2494, TE_all_m=2.9152, RE_all_deg=21.9418
+[test] weaker_treeloc_f/intra_session_localization ok in 13.7s: R_at_1=0.7449, F1=0.7798, AUC=0.7231, R_at_50=0.8633, SR=0.9358, TE_m=0.1435, RE_deg=0.8145, TE_all_m=0.7471, RE_all_deg=6.6798
+[test] weaker_treeloc_f/inter_session_localization ok in 29.7s: R_at_1=0.7263, F1=0.7278, AUC=0.6411, R_at_50=0.1971, SR=0.2362, TE_m=0.3835, RE_deg=1.6633, TE_all_m=3.1044, RE_all_deg=21.4949
+{
+  "intra_session_localization": {
+    "ablation_no_tdh": {
+      "R_at_1": 0.765375854214123,
+      "F1": 0.8024390243902438,
+      "AUC": 0.7449617314930181,
+      "R_at_50": 0.8656036446469249,
+      "SR": 0.9226190476190477,
+      "TE_m": 0.12247656456887004,
+      "RE_deg": 0.7412075755297574,
+      "TE_all_m": 0.7084459628419962,
+      "RE_all_deg": 6.058007463843478
+    },
+    "bruteforce_exhaustive": {
+      "R_at_1": 0.7972665148063781,
+      "F1": 0.8091236494597839,
+      "AUC": 0.7668024405510632,
+      "R_at_50": 0.9339407744874715,
+      "SR": 0.9457142857142857,
+      "TE_m": 0.12613661597481973,
+      "RE_deg": 0.7800837280237913,
+      "TE_all_m": 0.29686882629992595,
+      "RE_all_deg": 1.9046109525866455
+    },
+    "shortcut_artifact_replay": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_constant": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 93.52762867701361
+    },
+    "shortcut_crash": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_duplicate_predictions": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_missing_output": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_nan_translation": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_ordinal": {
+      "R_at_1": 0.0774487471526196,
+      "F1": 0.0774487471526196,
+      "AUC": 0.005998308435510402,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.673897393811226,
+      "RE_all_deg": 92.34975666867022
+    },
+    "shortcut_read_hidden": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 93.52762867701361
+    },
+    "shortcut_rotation_scale_huge": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_rotation_scale_small": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_self_match": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_train_lookup": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 93.52762867701361
+    },
+    "stronger_robust": {
+      "R_at_1": 0.8519362186788155,
+      "F1": 0.9095354523227384,
+      "AUC": 0.8506643069640978,
+      "R_at_50": 0.8906605922551253,
+      "SR": 0.9518716577540107,
+      "TE_m": 0.11924928444471943,
+      "RE_deg": 0.7856841545411734,
+      "TE_all_m": 0.7540215825284968,
+      "RE_all_deg": 6.815183115985785
+    },
+    "stronger_robust_tilt": {
+      "R_at_1": 0.8519362186788155,
+      "F1": 0.9095354523227384,
+      "AUC": 0.8506643069640978,
+      "R_at_50": 0.9043280182232346,
+      "SR": 0.9625668449197861,
+      "TE_m": 0.11949979097818882,
+      "RE_deg": 0.49708350398201784,
+      "TE_all_m": 0.7481468834465503,
+      "RE_all_deg": 6.544064771217206
+    },
+    "tdh_baseline": {
+      "R_at_1": 0.4009111617312073,
+      "F1": 0.4018264840182649,
+      "AUC": 0.16480759288570745,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 7.30737994566908,
+      "RE_all_deg": 82.1472691780604
+    },
+    "treeloc": {
+      "R_at_1": 0.7585421412300684,
+      "F1": 0.7905236907730674,
+      "AUC": 0.7371017702498592,
+      "R_at_50": 0.8792710706150342,
+      "SR": 0.933933933933934,
+      "TE_m": 0.12147464197616734,
+      "RE_deg": 0.7523701906579973,
+      "TE_all_m": 0.670085302483296,
+      "RE_all_deg": 5.92452975012848
+    },
+    "treeloc_no_alignment": {
+      "R_at_1": 0.621867881548975,
+      "F1": 0.6868686868686869,
+      "AUC": 0.5975947398202244,
+      "R_at_50": 0.22095671981776766,
+      "SR": 0.32234432234432236,
+      "TE_m": 0.21904886224795386,
+      "RE_deg": 2.8483580179133408,
+      "TE_all_m": 3.353904788754559,
+      "RE_all_deg": 33.54831786006448
+    },
+    "treeloc_seed1": {
+      "R_at_1": 0.7585421412300684,
+      "F1": 0.7905236907730674,
+      "AUC": 0.7371017702498592,
+      "R_at_50": 0.8792710706150342,
+      "SR": 0.933933933933934,
+      "TE_m": 0.12146371351780459,
+      "RE_deg": 0.7523701906579973,
+      "TE_all_m": 0.6700540260170931,
+      "RE_all_deg": 5.92452975012848
+    },
+    "treeloc_seed2": {
+      "R_at_1": 0.7585421412300684,
+      "F1": 0.7905236907730674,
+      "AUC": 0.7371017702498592,
+      "R_at_50": 0.8792710706150342,
+      "SR": 0.933933933933934,
+      "TE_m": 0.12152228140452881,
+      "RE_deg": 0.7523701906579973,
+      "TE_all_m": 0.6701190515999711,
+      "RE_all_deg": 5.92452975012848
+    },
+    "weaker_no_dbh": {
+      "R_at_1": 0.7517084282460137,
+      "F1": 0.7839195979899497,
+      "AUC": 0.7318598000351445,
+      "R_at_50": 0.8473804100227791,
+      "SR": 0.9181818181818182,
+      "TE_m": 0.11650116156247323,
+      "RE_deg": 0.787466044171257,
+      "TE_all_m": 0.8422423915408705,
+      "RE_all_deg": 6.601846636989313
+    },
+    "weaker_treeloc_f": {
+      "R_at_1": 0.744874715261959,
+      "F1": 0.7798277982779828,
+      "AUC": 0.7230930739825855,
+      "R_at_50": 0.8633257403189066,
+      "SR": 0.9357798165137615,
+      "TE_m": 0.14346832109176813,
+      "RE_deg": 0.814534673816185,
+      "TE_all_m": 0.7470620627467662,
+      "RE_all_deg": 6.679765903223286
+    }
+  },
+  "inter_session_localization": {
+    "ablation_no_tdh": {
+      "R_at_1": 0.6879562043795621,
+      "F1": 0.700507614213198,
+      "AUC": 0.6285104381683979,
+      "R_at_50": 0.24817518248175183,
+      "SR": 0.33421750663129973,
+      "TE_m": 0.4150621931378226,
+      "RE_deg": 1.2894223457704974,
+      "TE_all_m": 3.2646101478819265,
+      "RE_all_deg": 24.399478678785723
+    },
+    "bruteforce_exhaustive": {
+      "R_at_1": 0.6587591240875912,
+      "F1": 0.7169811320754716,
+      "AUC": 0.6218871444071956,
+      "R_at_50": 0.3175182481751825,
+      "SR": 0.41274238227146814,
+      "TE_m": 0.42034133795139844,
+      "RE_deg": 1.303253430132512,
+      "TE_all_m": 2.73847011162678,
+      "RE_all_deg": 22.479732050127996
+    },
+    "shortcut_artifact_replay": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_constant": {
+      "R_at_1": 0.016423357664233577,
+      "F1": 0.016423357664233577,
+      "AUC": 0.0002697266769673398,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.917932425201078,
+      "RE_all_deg": 106.73306492828074
+    },
+    "shortcut_crash": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_duplicate_predictions": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_missing_output": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_nan_translation": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_ordinal": {
+      "R_at_1": 0.0072992700729927005,
+      "F1": 0.0072992700729927005,
+      "AUC": 5.3279343598486864e-05,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.95998178845713,
+      "RE_all_deg": 99.47493387592824
+    },
+    "shortcut_read_hidden": {
+      "R_at_1": 0.016423357664233577,
+      "F1": 0.016423357664233577,
+      "AUC": 0.0002697266769673398,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.917932425201078,
+      "RE_all_deg": 106.73306492828074
+    },
+    "shortcut_rotation_scale_huge": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_rotation_scale_small": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_self_match": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_train_lookup": {
+      "R_at_1": 0.016423357664233577,
+      "F1": 0.016423357664233577,
+      "AUC": 0.0002697266769673398,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.917932425201078,
+      "RE_all_deg": 106.73306492828074
+    },
+    "stronger_robust": {
+      "R_at_1": 0.9799270072992701,
+      "F1": 0.988950276243094,
+      "AUC": 0.979923615445147,
+      "R_at_50": 0.3886861313868613,
+      "SR": 0.3947858472998138,
+      "TE_m": 0.43981757978773567,
+      "RE_deg": 1.1630473714992489,
+      "TE_all_m": 0.6276859728440255,
+      "RE_all_deg": 1.974485924197196
+    },
+    "stronger_robust_tilt": {
+      "R_at_1": 0.9799270072992701,
+      "F1": 0.988950276243094,
+      "AUC": 0.979923615445147,
+      "R_at_50": 0.4142335766423358,
+      "SR": 0.4208566108007449,
+      "TE_m": 0.4393113315413085,
+      "RE_deg": 0.32264589345453165,
+      "TE_all_m": 0.622947205648985,
+      "RE_all_deg": 1.112652528206924
+    },
+    "tdh_baseline": {
+      "R_at_1": 0.3740875912408759,
+      "F1": 0.37477148080438766,
+      "AUC": 0.1506838386760414,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 7.59948752852545,
+      "RE_all_deg": 128.1788620245844
+    },
+    "treeloc": {
+      "R_at_1": 0.7992700729927007,
+      "F1": 0.7999999999999999,
+      "AUC": 0.742679931750621,
+      "R_at_50": 0.2645985401459854,
+      "SR": 0.2990867579908676,
+      "TE_m": 0.413863288235839,
+      "RE_deg": 1.3083506991124025,
+      "TE_all_m": 2.4929316420707437,
+      "RE_all_deg": 16.368913194143335
+    },
+    "treeloc_no_alignment": {
+      "R_at_1": 0.24635036496350365,
+      "F1": 0.24952380952380956,
+      "AUC": 0.12361748779345164,
+      "R_at_50": 0.0036496350364963502,
+      "SR": 0.014814814814814815,
+      "TE_m": 0.38863270778120995,
+      "RE_deg": 3.241940415611483,
+      "TE_all_m": 8.414168262513549,
+      "RE_all_deg": 72.72796140291524
+    },
+    "treeloc_seed1": {
+      "R_at_1": 0.7992700729927007,
+      "F1": 0.7999999999999999,
+      "AUC": 0.742679931750621,
+      "R_at_50": 0.2645985401459854,
+      "SR": 0.2990867579908676,
+      "TE_m": 0.4138644184340333,
+      "RE_deg": 1.3083506991124025,
+      "TE_all_m": 2.492931922045161,
+      "RE_all_deg": 16.368913194143335
+    },
+    "treeloc_seed2": {
+      "R_at_1": 0.7992700729927007,
+      "F1": 0.7999999999999999,
+      "AUC": 0.742679931750621,
+      "R_at_50": 0.2645985401459854,
+      "SR": 0.2990867579908676,
+      "TE_m": 0.413863288235839,
+      "RE_deg": 1.3083506991124025,
+      "TE_all_m": 2.492931651870045,
+      "RE_all_deg": 16.368913194143335
+    },
+    "weaker_no_dbh": {
+      "R_at_1": 0.7463503649635036,
+      "F1": 0.7479376718606782,
+      "AUC": 0.694796942655122,
+      "R_at_50": 0.25,
+      "SR": 0.30317848410757947,
+      "TE_m": 0.4162444379572168,
+      "RE_deg": 1.2493649095056327,
+      "TE_all_m": 2.915205428839344,
+      "RE_all_deg": 21.941771164044194
+    },
+    "weaker_treeloc_f": {
+      "R_at_1": 0.7262773722627737,
+      "F1": 0.7277726856095326,
+      "AUC": 0.6410546359740847,
+      "R_at_50": 0.19708029197080293,
+      "SR": 0.23618090452261306,
+      "TE_m": 0.3834642125671943,
+      "RE_deg": 1.6632717738359895,
+      "TE_all_m": 3.1043831879139585,
+      "RE_all_deg": 21.49488472830583
+    }
+  }
+}

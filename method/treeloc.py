@@ -211,7 +211,7 @@ def make_scene(frame: dict, f: dict, use_alignment: bool = True, use_dbh: bool =
     # and the 60 m box crop is applied to the aligned positions afterwards.
     in_box = (np.abs(raw[:, 0]) <= BOX_HALF_WIDTH_M) & (np.abs(raw[:, 1]) <= BOX_HALF_WIDTH_M)
     rec = raw[:, 8] == 1
-    align = axis_alignment(raw[rec & in_box, 3:6]) if use_alignment else np.eye(3)
+    align = axis_alignment(raw[rec & in_box, 3:6])
     pos = raw[:, 0:3] @ align.T
     sel = select_trees(raw, g)
     if len(sel):
@@ -220,9 +220,14 @@ def make_scene(frame: dict, f: dict, use_alignment: bool = True, use_dbh: bool =
     centers = pos[sel, :2] if len(sel) else np.zeros((0, 2))
     heights = pos[sel, 2] if len(sel) else np.zeros(0)
     dbh = raw[sel, 6] if len(sel) else np.zeros(0)
-    scene = Scene(frame["id"], align, centers, heights, dbh, tdh_descriptor(centers, dbh, use_dbh))
-    pts = [tuple(p) for p in centers.tolist()]
-    for tri in knn_triangles(centers):
+    # Descriptors (TDH, triangle hashes) use the aligned centres. The paper's
+    # Table V "no alignment" ablation feeds the raw, unaligned centres to TDH
+    # and the triangle hash instead; verification and the 6-DoF pose still use
+    # the aligned scene (its SR stays at the full method's level in Table V).
+    desc = centers if use_alignment else (raw[sel, :2] if len(sel) else np.zeros((0, 2)))
+    scene = Scene(frame["id"], align, centers, heights, dbh, tdh_descriptor(desc, dbh, use_dbh))
+    pts = [tuple(p) for p in desc.tolist()]
+    for tri in knn_triangles(desc):
         h = triangle_hash(pts[tri[0]], pts[tri[1]], pts[tri[2]])
         scene.hash_list.append(h)
         scene.hash_last[h] = tri
@@ -347,7 +352,7 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--top-tdh", type=int, default=100, help="TDH candidates kept (<=0: all)")
     parser.add_argument("--top-hash", type=int, default=10, help="candidates verified after hash ranking (<=0: all)")
-    parser.add_argument("--no-alignment", action="store_true", help="ablation: skip tree-axis roll/pitch correction")
+    parser.add_argument("--no-alignment", action="store_true", help="ablation (Table V, Align = none): TDH and triangle hashes from raw, unaligned centres")
     parser.add_argument("--no-dbh", action="store_true", help="ablation: TDH without DBH bins")
     parser.add_argument("--first-step-only", action="store_true", help="ablation TreeLoc-f: centroid alignment only")
     parser.add_argument("--seed", type=int, default=0, help="seed of the vertical-offset RANSAC")

@@ -47,7 +47,7 @@ EXPERIMENTS = ("intra_session_localization", "inter_session_localization")
 EXPECTED_SHA256 = {
     "intra_session_localization.input.json.gz": "9864d2079b03a223c4a453163ff0bacb4c5541b30148982f3591a0da911da0db",
     "inter_session_localization.input.json.gz": "bbcbdd4cd3d5a62fee55f939286c5eed80d34f1def37f2b8b4aaf5aefc9b07e1",
-    "truth.json.gz": "e5d92cd24947e0653992f9da9f5818ff71bb91999a62b3b7b4f5096cfabb1012",
+    "truth.json.gz": "30043c69cdcda50378fa7077bde956cd4a386868b029de88f8b0dacf17441663",
 }
 
 # Operating points (fixed here, never read from data or method output).
@@ -342,9 +342,10 @@ def run_one(name: str, script: Path | None, exp: str, payload_bytes: bytes, payl
         except (ValueError, InvalidOutput) as exc:
             print(f"[{SLICE}] {name}/{exp} invalid output: {exc}", file=sys.stderr)
             return dict(WORST), f"failed: invalid output ({str(exc)[:200]})"
-        if details_dir is not None:
+        if details_dir is not None:  # audit option (TREELOC_DETAILS_DIR); off in the hidden test
             details_dir.mkdir(parents=True, exist_ok=True)
             (details_dir / f"{name}__{exp}.json").write_text(json.dumps(details))
+            shutil.copyfile(out_path, details_dir / f"{name}__{exp}.output.json")
         print(f"[{SLICE}] {name}/{exp} ok in {elapsed:.1f}s: " + ", ".join(f"{k}={v:.4f}" for k, v in metrics.items()), file=sys.stderr)
         return metrics, "ok"
     finally:

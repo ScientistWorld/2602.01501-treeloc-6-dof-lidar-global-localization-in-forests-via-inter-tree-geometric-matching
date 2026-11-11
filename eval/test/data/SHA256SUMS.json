@@ -1,5 +1,5 @@
 {
   "inter_session_localization.input.json.gz": "bbcbdd4cd3d5a62fee55f939286c5eed80d34f1def37f2b8b4aaf5aefc9b07e1",
   "intra_session_localization.input.json.gz": "9864d2079b03a223c4a453163ff0bacb4c5541b30148982f3591a0da911da0db",
-  "truth.json.gz": "e5d92cd24947e0653992f9da9f5818ff71bb91999a62b3b7b4f5096cfabb1012"
+  "truth.json.gz": "30043c69cdcda50378fa7077bde956cd4a386868b029de88f8b0dacf17441663"
 }

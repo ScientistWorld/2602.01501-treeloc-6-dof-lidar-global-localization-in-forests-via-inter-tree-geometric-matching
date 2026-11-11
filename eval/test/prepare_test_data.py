@@ -146,7 +146,103 @@ def evaluable_queries(query_traj, query_idx, db_traj, db_idx) -> list[int]:
     return [i for i in query_idx if grid.any_within(query_traj[i][0], query_traj[i][1], POSITIVE_RADIUS_M)]
 
 
-def build_experiment(setting: str, db_dir: Path, db_idx: list[int], q_dir: Path, q_idx: list[int], rng: random.Random, seq_name: str):
+
+# ----------------------------------------------------------------------------- inter-session ground truth
+# The released V-02 and V-03 trajectories are each self-consistent, but V-03 is
+# offset from V-02 by about half a metre (and slowly varying) in the world frame,
+# so V-03 -> V-02 relative poses taken directly from them are off by ~0.5 m.
+# Each V-03 position is therefore registered to the V-02 frame before relative
+# poses are formed: its world-projected reconstructed stems (and those of the
+# neighbouring frames) are matched to the V-02 stem map (nearest stem with
+# similar DBH) and the median displacement is added to the V-03 position.
+# Two passes (1.0 m, then 0.35 m matching radius). Rotations are unchanged.
+
+REG_RANGE_M = 25.0
+REG_DBH_GATE_M = 0.15
+REG_WINDOW = 5
+REG_MIN_PAIRS = 15
+
+
+def quat_to_rot(qx: float, qy: float, qz: float, qw: float) -> list[list[float]]:
+    n = math.sqrt(qx * qx + qy * qy + qz * qz + qw * qw)
+    qx, qy, qz, qw = qx / n, qy / n, qz / n, qw / n
+    return [
+        [1 - 2 * (qy * qy + qz * qz), 2 * (qx * qy - qz * qw), 2 * (qx * qz + qy * qw)],
+        [2 * (qx * qy + qz * qw), 1 - 2 * (qx * qx + qz * qz), 2 * (qy * qz - qx * qw)],
+        [2 * (qx * qz - qy * qw), 2 * (qy * qz + qx * qw), 1 - 2 * (qx * qx + qy * qy)],
+    ]
+
+
+def world_stems(seq_dir: Path, index: int, pose: list[float]) -> list[tuple[float, float, float, float]]:
+    """Reconstructed stems of one frame within REG_RANGE_M, in world coordinates."""
+    r = quat_to_rot(*pose[3:7])
+    out = []
+    for row in read_trees(seq_dir, index):
+        if row[9] != 1 or math.hypot(row[0], row[1]) > REG_RANGE_M:
+            continue
+        d = row[6] if row[6] is not None else row[7]
+        x, y, z = row[0], row[1], row[2]
+        out.append(tuple(r[k][0] * x + r[k][1] * y + r[k][2] * z + pose[k] for k in range(3)) + (d,))
+    return out
+
+
+
+def _median(values: list[float]) -> float:
+    s = sorted(values)
+    m = len(s) // 2
+    return s[m] if len(s) % 2 else 0.5 * (s[m - 1] + s[m])
+
+
+def session_registration_offsets(ref_dir: Path, q_dir: Path) -> dict[int, tuple[float, float, float]]:
+    """Per-frame world translation registering q_dir's trajectory to ref_dir's frame."""
+    ref_traj, q_traj = read_trajectory(ref_dir), read_trajectory(q_dir)
+    grid: dict[tuple[int, int], list[tuple[float, float, float, float]]] = {}
+    for i, pose in enumerate(ref_traj):
+        for p in world_stems(ref_dir, i, pose):
+            grid.setdefault((int(math.floor(p[0])), int(math.floor(p[1]))), []).append(p)
+    q_stems = []
+    for i, pose in enumerate(q_traj):
+        q_stems.append(world_stems(q_dir, i, pose))
+
+    def displacements(stems, offset, radius):
+        out = []
+        reach = int(math.ceil(radius))
+        for x, y, z, d in stems:
+            x, y, z = x + offset[0], y + offset[1], z + offset[2]
+            cx, cy = int(math.floor(x)), int(math.floor(y))
+            best, best_d = None, radius
+            for gx in range(cx - reach, cx + reach + 1):
+                for gy in range(cy - reach, cy + reach + 1):
+                    for p in grid.get((gx, gy), ()):
+                        if abs(p[3] - d) > REG_DBH_GATE_M:
+                            continue
+                        dist = math.hypot(p[0] - x, p[1] - y)
+                        if dist < best_d:
+                            best, best_d = p, dist
+            if best is not None:
+                out.append((best[0] - x, best[1] - y, best[2] - z))
+        return out
+
+    n = len(q_traj)
+    offsets = [(0.0, 0.0, 0.0)] * n
+    for radius in (1.0, 0.35):
+        per_frame = [displacements(q_stems[i], offsets[i], radius) for i in range(n)]
+        pooled_all = [v for frame in per_frame for v in frame]
+        global_med = tuple(_median([v[k] for v in pooled_all]) for k in range(3)) if pooled_all else (0.0, 0.0, 0.0)
+        new = []
+        for i in range(n):
+            pooled = []
+            for w in (REG_WINDOW, 4 * REG_WINDOW):
+                pooled = [v for j in range(max(0, i - w), min(n, i + w + 1)) for v in per_frame[j]]
+                if len(pooled) >= REG_MIN_PAIRS:
+                    break
+            med = tuple(_median([v[k] for v in pooled]) for k in range(3)) if len(pooled) >= REG_MIN_PAIRS else global_med
+            new.append(tuple(offsets[i][k] + med[k] for k in range(3)))
+        offsets = new
+    return {i: offsets[i] for i in range(n)}
+
+
+def build_experiment(setting: str, db_dir: Path, db_idx: list[int], q_dir: Path, q_idx: list[int], rng: random.Random, seq_name: str, q_offsets: dict | None = None):
     db_traj = read_trajectory(db_dir)
     q_traj = read_trajectory(q_dir)
     q_idx = evaluable_queries(q_traj, q_idx, db_traj, db_idx)
@@ -168,7 +264,10 @@ def build_experiment(setting: str, db_dir: Path, db_idx: list[int], q_dir: Path,
     for i in q_idx:
         fid = new_id()
         queries.append({"id": fid, "trees": read_trees(q_dir, i)})
-        truth_q[fid] = [round(v, 6) for v in q_traj[i]]
+        pose = list(q_traj[i])
+        if q_offsets is not None:
+            pose[0:3] = [pose[k] + q_offsets[i][k] for k in range(3)]
+        truth_q[fid] = [round(v, 6) for v in pose]
         source[fid] = f"{q_dir.name}:{i}"
     rng.shuffle(database)
     rng.shuffle(queries)
@@ -179,6 +278,8 @@ def build_experiment(setting: str, db_dir: Path, db_idx: list[int], q_dir: Path,
         "sequences": [{"name": seq_name, "database": database, "queries": queries}],
     }
     truth = {"pose_format": "x y z qx qy qz qw (frame-to-world)", "database": truth_db, "queries": truth_q, "source": source}
+    if q_offsets is not None:
+        truth["note"] = f"query positions registered to the {db_dir.name} frame by stem-map alignment (session_registration_offsets)"
     return payload, truth
 
 
@@ -214,7 +315,7 @@ def main() -> None:
     db_idx = [i for i, p in enumerate(t02) if distance_to_test_regions(p[0], p[1]) <= TEST_DB_MARGIN_M]
     q_idx = [i for i, p in enumerate(t03) if distance_to_test_regions(p[0], p[1]) == 0.0]
     experiments["inter_session_localization"] = build_experiment(
-        "inter_session", v02, db_idx, v03, q_idx, rng, "seq_v"
+        "inter_session", v02, db_idx, v03, q_idx, rng, "seq_v", q_offsets=session_registration_offsets(v02, v03)
     )
 
     hashes = {}

@@ -1,0 +1,123 @@
+[test] shortcut_empty_output/intra_session_localization invalid output: missing predictions for 439 queries
+[test] shortcut_empty_output/inter_session_localization invalid output: missing predictions for 548 queries
+[test] shortcut_forge_scores/intra_session_localization ok in 0.8s: R_at_1=0.0000, F1=0.0000, AUC=0.0000, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=10.0000, RE_all_deg=93.5276
+[test] shortcut_forge_scores/inter_session_localization ok in 1.4s: R_at_1=0.0164, F1=0.0164, AUC=0.0003, R_at_50=0.0000, SR=0.0000, TE_m=0.5000, RE_deg=5.0000, TE_all_m=9.9179, RE_all_deg=106.7331
+[test] /home/user/scoring/scores_train.json was modified while submissions ran; restoring it
+[test] /home/user/scoring/scores_test.json was modified while submissions ran; restoring it
+{
+  "intra_session_localization": {
+    "shortcut_empty_output": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_forge_scores": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 93.52762867701361
+    },
+    "tdh_baseline": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "treeloc": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "treeloc_no_alignment": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    }
+  },
+  "inter_session_localization": {
+    "shortcut_empty_output": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "shortcut_forge_scores": {
+      "R_at_1": 0.016423357664233577,
+      "F1": 0.016423357664233577,
+      "AUC": 0.0002697266769673398,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 9.917932425201078,
+      "RE_all_deg": 106.73306492828074
+    },
+    "tdh_baseline": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "treeloc": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    },
+    "treeloc_no_alignment": {
+      "R_at_1": 0.0,
+      "F1": 0.0,
+      "AUC": 0.0,
+      "R_at_50": 0.0,
+      "SR": 0.0,
+      "TE_m": 0.5,
+      "RE_deg": 5.0,
+      "TE_all_m": 10.0,
+      "RE_all_deg": 180.0
+    }
+  }
+}
+FORGE: official score files unchanged after the run

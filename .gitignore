@@ -240,3 +240,5 @@ core.[0-9]*
 redteam/hardening/results/details_*/
 redteam/hardening/results/*.log
 redteam/hardening/results/*.done
+redteam/hardening/results/smoke_*.json
+redteam/hardening/results/truth_backup/
