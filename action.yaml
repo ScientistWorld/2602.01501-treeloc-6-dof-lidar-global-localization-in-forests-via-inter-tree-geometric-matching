@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: core_claim
-notes: "Rerun after fixes: V-03 ground truth registered to V-02 (removes ~0.5 m session offset that broke inter-session pose metrics), paper's Table V no-alignment ablation restored. Reruns reference+baselines on train/test, full test audit (variants, brute force, shortcuts), forge/tamper, rescored train audit, analysis, validate."
+notes: "Hardened TreeLoc gym on the authors' real tree inventories (Stein/Venman hidden test). Inter-session GT registered, paper's Table V ablation restored, evaluator file guards added. Stronger variant +2.73 (CI excludes 0), all paper ablations below reference, every shortcut scores worst. Exhaustive verification still +0.47 (released data cannot be scaled; documented in HARDENING.md)."
