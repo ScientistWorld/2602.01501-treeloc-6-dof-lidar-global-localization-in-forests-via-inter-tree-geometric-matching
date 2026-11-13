@@ -1,0 +1,80 @@
+registration offsets in 18s
+inter_A15: 543 database, 548 queries
+inter_B15: 660 database, 465 queries
+inter_A35: 717 database, 548 queries
+inter_B35: 966 database, 465 queries
+inter_A50: 882 database, 548 queries
+inter_B50: 1198 database, 465 queries
+intra_SP: seq_s0 150/127, seq_s2 450/7, seq_s3 600/140, seq_s4 750/145, seq_s5 900/96
+inter_A35/verify_tdh100 ok in 63s: R_at_1=0.655, F1=0.700, AUC=0.616, R_at_50=0.617, SR=0.841, TE_m=0.131, RE_deg=1.318, TE_all_m=2.949, RE_all_deg=24.603
+inter_A50/verify_tdh100 ok in 69s: R_at_1=0.653, F1=0.699, AUC=0.616, R_at_50=0.604, SR=0.835, TE_m=0.133, RE_deg=1.324, TE_all_m=3.074, RE_all_deg=26.681
+inter_B35/verify_tdh100 ok in 106s: R_at_1=0.641, F1=0.704, AUC=0.618, R_at_50=0.611, SR=0.859, TE_m=0.125, RE_deg=1.271, TE_all_m=3.177, RE_all_deg=27.688
+inter_B50/verify_tdh100 ok in 116s: R_at_1=0.628, F1=0.688, AUC=0.600, R_at_50=0.589, SR=0.842, TE_m=0.127, RE_deg=1.278, TE_all_m=3.293, RE_all_deg=28.450
+inter_B15/verify_tdh100 ok in 56s: R_at_1=0.665, F1=0.715, AUC=0.638, R_at_50=0.634, SR=0.864, TE_m=0.129, RE_deg=1.282, TE_all_m=2.963, RE_all_deg=26.057
+inter_A15/verify_tdh100 ok in 67s: R_at_1=0.666, F1=0.704, AUC=0.625, R_at_50=0.635, SR=0.841, TE_m=0.133, RE_deg=1.315, TE_all_m=2.769, RE_all_deg=24.023
+intra_SP/verify_tdh100 ok in 59s: R_at_1=0.883, F1=0.900, AUC=0.874, R_at_50=0.928, SR=0.956, TE_m=0.124, RE_deg=0.852, TE_all_m=0.326, RE_all_deg=2.837
+inter_A35/bruteforce_exhaustive ok in 274s: R_at_1=0.659, F1=0.715, AUC=0.617, R_at_50=0.715, SR=0.925, TE_m=0.127, RE_deg=1.307, TE_all_m=2.466, RE_all_deg=21.241
+intra_S50/verify_tdh100 ok in 32s: R_at_1=0.770, F1=0.802, AUC=0.746, R_at_50=0.893, SR=0.944, TE_m=0.123, RE_deg=0.769, TE_all_m=0.578, RE_all_deg=4.577
+inter_A50/bruteforce_exhaustive ok in 318s: R_at_1=0.655, F1=0.714, AUC=0.614, R_at_50=0.715, SR=0.930, TE_m=0.127, RE_deg=1.307, TE_all_m=2.483, RE_all_deg=22.322
+intra_SP/bruteforce_exhaustive ok in 192s: R_at_1=0.905, F1=0.914, AUC=0.892, R_at_50=0.946, SR=0.959, TE_m=0.122, RE_deg=0.845, TE_all_m=0.266, RE_all_deg=1.711
+intra_S50/bruteforce_exhaustive ok in 78s: R_at_1=0.797, F1=0.809, AUC=0.767, R_at_50=0.934, SR=0.946, TE_m=0.126, RE_deg=0.780, TE_all_m=0.297, RE_all_deg=1.905
+inter_B35/bruteforce_exhaustive ok in 326s: R_at_1=0.692, F1=0.761, AUC=0.663, R_at_50=0.748, SR=0.957, TE_m=0.124, RE_deg=1.304, TE_all_m=2.349, RE_all_deg=22.599
+inter_A15/bruteforce_exhaustive ok in 235s: R_at_1=0.659, F1=0.715, AUC=0.617, R_at_50=0.715, SR=0.925, TE_m=0.127, RE_deg=1.307, TE_all_m=2.466, RE_all_deg=22.480
+inter_B50/weaker_treeloc_f ok in 37s: R_at_1=0.686, F1=0.686, AUC=0.587, R_at_50=0.372, SR=0.476, TE_m=0.198, RE_deg=1.504, TE_all_m=3.277, RE_all_deg=23.086
+inter_B50/weaker_no_dbh ok in 36s: R_at_1=0.665, F1=0.672, AUC=0.609, R_at_50=0.439, SR=0.605, TE_m=0.136, RE_deg=1.291, TE_all_m=3.626, RE_all_deg=28.292
+inter_B50/tdh_baseline ok in 3s: R_at_1=0.338, F1=0.338, AUC=0.118, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.828, RE_all_deg=127.258
+inter_B50/treeloc ok in 58s: R_at_1=0.744, F1=0.747, AUC=0.695, R_at_50=0.520, SR=0.645, TE_m=0.133, RE_deg=1.296, TE_all_m=2.872, RE_all_deg=22.829
+inter_B50/treeloc_no_alignment ok in 40s: R_at_1=0.243, F1=0.247, AUC=0.133, R_at_50=0.065, SR=0.212, TE_m=0.139, RE_deg=1.644, TE_all_m=8.228, RE_all_deg=72.026
+inter_B50/bruteforce_exhaustive ok in 387s: R_at_1=0.692, F1=0.761, AUC=0.663, R_at_50=0.748, SR=0.957, TE_m=0.124, RE_deg=1.304, TE_all_m=2.349, RE_all_deg=21.573
+inter_B50/stronger_robust_tilt ok in 89s: R_at_1=0.976, F1=0.986, AUC=0.976, R_at_50=0.985, SR=0.996, TE_m=0.070, RE_deg=0.367, TE_all_m=0.188, RE_all_deg=1.474
+inter_B50/ablation_no_tdh ok in 97s: R_at_1=0.718, F1=0.732, AUC=0.667, R_at_50=0.574, SR=0.725, TE_m=0.136, RE_deg=1.290, TE_all_m=2.732, RE_all_deg=21.177
+inter_A50/tdh_baseline ok in 2s: R_at_1=0.332, F1=0.333, AUC=0.119, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.912, RE_all_deg=125.124
+inter_A50/weaker_no_dbh ok in 35s: R_at_1=0.692, F1=0.699, AUC=0.628, R_at_50=0.496, SR=0.646, TE_m=0.134, RE_deg=1.298, TE_all_m=3.126, RE_all_deg=25.072
+inter_A50/weaker_treeloc_f ok in 39s: R_at_1=0.710, F1=0.718, AUC=0.628, R_at_50=0.378, SR=0.478, TE_m=0.192, RE_deg=1.498, TE_all_m=3.238, RE_all_deg=23.161
+inter_A50/treeloc_no_alignment ok in 35s: R_at_1=0.301, F1=0.301, AUC=0.169, R_at_50=0.066, SR=0.200, TE_m=0.143, RE_deg=1.466, TE_all_m=8.087, RE_all_deg=70.396
+inter_A50/treeloc ok in 58s: R_at_1=0.774, F1=0.779, AUC=0.726, R_at_50=0.524, SR=0.639, TE_m=0.133, RE_deg=1.305, TE_all_m=2.654, RE_all_deg=19.625
+inter_A50/ablation_no_tdh ok in 81s: R_at_1=0.686, F1=0.699, AUC=0.624, R_at_50=0.522, SR=0.684, TE_m=0.132, RE_deg=1.329, TE_all_m=3.088, RE_all_deg=25.217
+inter_A50/stronger_robust_tilt ok in 89s: R_at_1=0.980, F1=0.989, AUC=0.980, R_at_50=0.984, SR=0.996, TE_m=0.068, RE_deg=0.384, TE_all_m=0.197, RE_all_deg=1.256
+inter_B35/tdh_baseline ok in 2s: R_at_1=0.355, F1=0.355, AUC=0.133, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.724, RE_all_deg=128.959
+inter_B15/bruteforce_exhaustive ok in 391s: R_at_1=0.699, F1=0.761, AUC=0.668, R_at_50=0.748, SR=0.948, TE_m=0.124, RE_deg=1.304, TE_all_m=2.306, RE_all_deg=21.798
+inter_B35/treeloc ok in 37s: R_at_1=0.772, F1=0.772, AUC=0.727, R_at_50=0.535, SR=0.646, TE_m=0.133, RE_deg=1.311, TE_all_m=2.696, RE_all_deg=19.857
+inter_B35/weaker_treeloc_f ok in 33s: R_at_1=0.703, F1=0.703, AUC=0.609, R_at_50=0.383, SR=0.483, TE_m=0.199, RE_deg=1.497, TE_all_m=3.162, RE_all_deg=22.257
+inter_B35/treeloc_no_alignment ok in 34s: R_at_1=0.249, F1=0.251, AUC=0.128, R_at_50=0.069, SR=0.216, TE_m=0.136, RE_deg=1.692, TE_all_m=8.188, RE_all_deg=71.138
+inter_B35/weaker_no_dbh ok in 47s: R_at_1=0.692, F1=0.695, AUC=0.636, R_at_50=0.467, SR=0.618, TE_m=0.138, RE_deg=1.299, TE_all_m=3.383, RE_all_deg=27.040
+inter_A35/treeloc ok in 37s: R_at_1=0.786, F1=0.789, AUC=0.733, R_at_50=0.536, SR=0.636, TE_m=0.132, RE_deg=1.306, TE_all_m=2.450, RE_all_deg=17.704
+inter_A35/weaker_treeloc_f ok in 32s: R_at_1=0.724, F1=0.726, AUC=0.645, R_at_50=0.387, SR=0.484, TE_m=0.197, RE_deg=1.524, TE_all_m=3.119, RE_all_deg=22.033
+inter_A35/tdh_baseline ok in 3s: R_at_1=0.352, F1=0.353, AUC=0.136, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.768, RE_all_deg=127.643
+inter_B35/ablation_no_tdh ok in 85s: R_at_1=0.720, F1=0.733, AUC=0.668, R_at_50=0.574, SR=0.722, TE_m=0.136, RE_deg=1.290, TE_all_m=2.720, RE_all_deg=20.705
+inter_B35/stronger_robust_tilt ok in 88s: R_at_1=0.978, F1=0.987, AUC=0.978, R_at_50=0.987, SR=0.996, TE_m=0.070, RE_deg=0.366, TE_all_m=0.167, RE_all_deg=1.239
+inter_A35/weaker_no_dbh ok in 36s: R_at_1=0.721, F1=0.730, AUC=0.660, R_at_50=0.522, SR=0.653, TE_m=0.129, RE_deg=1.298, TE_all_m=2.869, RE_all_deg=22.717
+inter_B15/treeloc ok in 30s: R_at_1=0.772, F1=0.772, AUC=0.727, R_at_50=0.559, SR=0.671, TE_m=0.138, RE_deg=1.298, TE_all_m=2.609, RE_all_deg=19.230
+inter_B15/weaker_treeloc_f ok in 30s: R_at_1=0.712, F1=0.712, AUC=0.614, R_at_50=0.400, SR=0.489, TE_m=0.202, RE_deg=1.529, TE_all_m=3.007, RE_all_deg=20.612
+inter_A35/stronger_robust_tilt ok in 82s: R_at_1=0.980, F1=0.989, AUC=0.980, R_at_50=0.985, SR=0.996, TE_m=0.068, RE_deg=0.381, TE_all_m=0.179, RE_all_deg=1.115
+inter_A35/treeloc_no_alignment ok in 54s: R_at_1=0.290, F1=0.296, AUC=0.163, R_at_50=0.064, SR=0.195, TE_m=0.147, RE_deg=1.507, TE_all_m=8.132, RE_all_deg=72.700
+inter_B15/tdh_baseline ok in 3s: R_at_1=0.383, F1=0.385, AUC=0.155, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.579, RE_all_deg=132.178
+inter_B15/weaker_no_dbh ok in 30s: R_at_1=0.725, F1=0.725, AUC=0.667, R_at_50=0.495, SR=0.626, TE_m=0.139, RE_deg=1.302, TE_all_m=3.027, RE_all_deg=22.794
+inter_B15/treeloc_no_alignment ok in 31s: R_at_1=0.265, F1=0.266, AUC=0.137, R_at_50=0.071, SR=0.220, TE_m=0.126, RE_deg=1.654, TE_all_m=8.010, RE_all_deg=71.156
+inter_B15/ablation_no_tdh ok in 65s: R_at_1=0.718, F1=0.731, AUC=0.666, R_at_50=0.583, SR=0.728, TE_m=0.136, RE_deg=1.292, TE_all_m=2.665, RE_all_deg=19.815
+inter_A35/ablation_no_tdh ok in 112s: R_at_1=0.684, F1=0.697, AUC=0.622, R_at_50=0.524, SR=0.685, TE_m=0.132, RE_deg=1.329, TE_all_m=3.087, RE_all_deg=25.131
+inter_A15/tdh_baseline ok in 3s: R_at_1=0.374, F1=0.375, AUC=0.151, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.623, RE_all_deg=128.179
+inter_A15/treeloc ok in 36s: R_at_1=0.799, F1=0.800, AUC=0.745, R_at_50=0.551, SR=0.637, TE_m=0.133, RE_deg=1.300, TE_all_m=2.289, RE_all_deg=16.369
+inter_B15/stronger_robust_tilt ok in 83s: R_at_1=0.983, F1=0.989, AUC=0.983, R_at_50=0.989, SR=0.996, TE_m=0.070, RE_deg=0.366, TE_all_m=0.145, RE_all_deg=1.001
+inter_A15/weaker_treeloc_f ok in 35s: R_at_1=0.730, F1=0.731, AUC=0.646, R_at_50=0.403, SR=0.490, TE_m=0.203, RE_deg=1.509, TE_all_m=2.959, RE_all_deg=21.495
+inter_A15/weaker_no_dbh ok in 33s: R_at_1=0.745, F1=0.746, AUC=0.687, R_at_50=0.536, SR=0.659, TE_m=0.128, RE_deg=1.299, TE_all_m=2.714, RE_all_deg=21.942
+inter_A15/treeloc_no_alignment ok in 32s: R_at_1=0.290, F1=0.296, AUC=0.161, R_at_50=0.064, SR=0.195, TE_m=0.147, RE_deg=1.507, TE_all_m=8.150, RE_all_deg=72.554
+inter_A15/stronger_robust_tilt ok in 82s: R_at_1=0.980, F1=0.989, AUC=0.980, R_at_50=0.987, SR=0.998, TE_m=0.068, RE_deg=0.382, TE_all_m=0.178, RE_all_deg=1.113
+intra_SP/tdh_baseline ok in 2s: R_at_1=0.586, F1=0.586, AUC=0.344, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=6.190, RE_all_deg=103.289
+intra_SP/treeloc ok in 39s: R_at_1=0.876, F1=0.893, AUC=0.866, R_at_50=0.922, SR=0.953, TE_m=0.125, RE_deg=0.850, TE_all_m=0.424, RE_all_deg=3.360
+intra_SP/weaker_treeloc_f ok in 39s: R_at_1=0.868, F1=0.882, AUC=0.856, R_at_50=0.907, SR=0.944, TE_m=0.151, RE_deg=0.926, TE_all_m=0.491, RE_all_deg=4.105
+intra_SP/ablation_no_tdh ok in 55s: R_at_1=0.874, F1=0.889, AUC=0.862, R_at_50=0.903, SR=0.940, TE_m=0.120, RE_deg=0.826, TE_all_m=0.577, RE_all_deg=4.951
+intra_SP/weaker_no_dbh ok in 39s: R_at_1=0.862, F1=0.886, AUC=0.853, R_at_50=0.909, SR=0.939, TE_m=0.115, RE_deg=0.827, TE_all_m=0.468, RE_all_deg=3.380
+intra_SP/treeloc_no_alignment ok in 39s: R_at_1=0.773, F1=0.787, AUC=0.754, R_at_50=0.734, SR=0.867, TE_m=0.115, RE_deg=0.801, TE_all_m=2.131, RE_all_deg=18.468
+inter_A15/ablation_no_tdh ok in 103s: R_at_1=0.688, F1=0.698, AUC=0.624, R_at_50=0.526, SR=0.684, TE_m=0.132, RE_deg=1.329, TE_all_m=3.071, RE_all_deg=24.399
+intra_S50/treeloc ok in 18s: R_at_1=0.759, F1=0.791, AUC=0.737, R_at_50=0.879, SR=0.934, TE_m=0.121, RE_deg=0.752, TE_all_m=0.670, RE_all_deg=5.925
+intra_S50/tdh_baseline ok in 2s: R_at_1=0.401, F1=0.402, AUC=0.165, R_at_50=0.000, SR=0.000, TE_m=0.500, RE_deg=5.000, TE_all_m=7.307, RE_all_deg=82.147
+intra_S50/weaker_treeloc_f ok in 16s: R_at_1=0.745, F1=0.780, AUC=0.723, R_at_50=0.863, SR=0.936, TE_m=0.143, RE_deg=0.815, TE_all_m=0.747, RE_all_deg=6.680
+intra_S50/ablation_no_tdh ok in 29s: R_at_1=0.765, F1=0.802, AUC=0.745, R_at_50=0.866, SR=0.923, TE_m=0.122, RE_deg=0.741, TE_all_m=0.708, RE_all_deg=6.058
+intra_S50/weaker_no_dbh ok in 16s: R_at_1=0.752, F1=0.784, AUC=0.732, R_at_50=0.847, SR=0.918, TE_m=0.117, RE_deg=0.787, TE_all_m=0.842, RE_all_deg=6.602
+intra_S50/treeloc_no_alignment ok in 16s: R_at_1=0.636, F1=0.702, AUC=0.612, R_at_50=0.663, SR=0.896, TE_m=0.113, RE_deg=0.725, TE_all_m=2.803, RE_all_deg=24.391
+intra_S50/stronger_robust_tilt ok in 60s: R_at_1=0.852, F1=0.910, AUC=0.851, R_at_50=0.904, SR=0.963, TE_m=0.119, RE_deg=0.497, TE_all_m=0.748, RE_all_deg=6.544
+intra_SP/stronger_robust_tilt ok in 161s: R_at_1=0.946, F1=0.966, AUC=0.945, R_at_50=0.944, SR=0.961, TE_m=0.110, RE_deg=0.466, TE_all_m=0.308, RE_all_deg=2.008

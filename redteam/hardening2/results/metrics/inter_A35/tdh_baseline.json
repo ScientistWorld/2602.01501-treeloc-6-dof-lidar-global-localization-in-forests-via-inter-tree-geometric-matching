@@ -1,0 +1,1 @@
+{"variant": "inter_A35", "method": "tdh_baseline", "status": "ok", "seconds": 2.8, "metrics": {"R_at_1": 0.3521897810218978, "F1": 0.35347985347985345, "AUC": 0.1359145429535631, "R_at_50": 0.0, "SR": 0.0, "TE_m": 0.5, "RE_deg": 5.0, "TE_all_m": 7.76840975086125, "RE_all_deg": 127.6429833389945}, "n_queries": 548, "n_database": 717}

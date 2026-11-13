@@ -1,0 +1,1 @@
+{"variant": "intra_S50", "method": "tdh_baseline", "status": "ok", "seconds": 2.3, "metrics": {"R_at_1": 0.4009111617312073, "F1": 0.4018264840182649, "AUC": 0.16480759288570745, "R_at_50": 0.0, "SR": 0.0, "TE_m": 0.5, "RE_deg": 5.0, "TE_all_m": 7.30737994566908, "RE_all_deg": 82.1472691780604}, "n_queries": 439, "n_database": 523}
