@@ -241,3 +241,6 @@ redteam/hardening/results/details_*/
 redteam/hardening/results/*.done
 redteam/hardening/results/smoke_*.json
 redteam/hardening/results/truth_backup/
+
+# hardening iteration 12: per-query exploration details (regenerable)
+redteam/hardening2/results/details/
