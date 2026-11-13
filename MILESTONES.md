@@ -64,5 +64,9 @@
 - Registered the V-03 inter-session ground truth to V-02 (the released trajectories are ~0.5 m apart), restored the paper's Table V no-alignment ablation, added evaluator file guards, matched the released tree-selection order.
 - Reference on hidden Stein: R@50 0.879, SR 0.934, TE 0.121 m (paper 6-DoF: 0.908 / 0.940 / 0.126 m); stronger variant +2.73 rank, all paper ablations below the reference, all shortcuts at worst values; exhaustive verification still +0.47 (documented in HARDENING.md).
 
+### [2026-11-13] - core_claim (iteration 12, hardening)
+- Followed up REVIEW.md (brute force +0.47): job `5b8d7c91-23d` scaled the hidden inter-session test (both session directions, database margin 15/35/50 m, up to 2,080 scenes) and tried the paper's growing-database intra protocol. Every larger database widened brute force's margin (+0.43 up to +0.90), because the reference's TDH shortlist dilutes while exhaustive verification is unaffected. The paper protocol leaks time order that pays. Re-weighting is not robust to the ranking population.
+- The hidden test, data and reference scores are unchanged (reproduced bit for bit). Exhaustive verification is now out of bounds by a per-query detailed-matching budget (100 scenes, independent of database size) in CONSTRAINTS.md / DIRECTION.md, enforced by the grader; evidence in redteam/hardening2/, report in HARDENING.md.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.

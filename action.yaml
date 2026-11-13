@@ -1,6 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
-action: submit
-gpus: 0
-test: false
+# Do NOT sleep, poll, or wait for jobs. The system reads this file
+# only after your turn ends.
+action: done
 milestone: core_claim
-notes: "Hardening exploration: inter-session test scaled (both directions, database margin 15/35/50 m) and paper-protocol intra; reference, brute force, stronger/weaker variants on each"
+notes: "Iteration 12: scaling the hidden test (both Venman directions, databases to 2,080 scenes, paper intra protocol) widens brute force's margin (+0.43 to +0.90) because TDH dilutes while exhaustive verification does not; test/data/reference unchanged (reproduced bit for bit); exhaustive verification closed by a per-query detailed-matching budget rule for the grader; evidence in redteam/hardening2, report in HARDENING.md"

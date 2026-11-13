@@ -1,0 +1,8 @@
+seq_s0: positives in most recent block = all: 127 queries
+seq_s2: positives in most recent block = all: 3 queries
+seq_s2: positives in most recent block = none: 4 queries
+seq_s3: positives in most recent block = all: 101 queries
+seq_s3: positives in most recent block = some: 39 queries
+seq_s4: positives in most recent block = none: 105 queries
+seq_s4: positives in most recent block = some: 40 queries
+seq_s5: positives in most recent block = some: 96 queries

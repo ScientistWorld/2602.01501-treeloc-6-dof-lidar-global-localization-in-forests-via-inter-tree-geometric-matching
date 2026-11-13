@@ -1,4 +1,143 @@
-# Hardening report — TreeLoc gym, iteration 11
+# Hardening report — TreeLoc gym
+
+Iteration 12 answers `REVIEW.md`. The iteration-11 report follows unchanged below. It records how the gym got
+here: real data, the hidden test running methods itself, strict validation, file guards and the ground-truth
+registration.
+
+## Iteration 12: the review's brute-force finding
+
+`REVIEW.md` reported one weakness. A brute-force matcher outranks the reference: the paper's verifier run on
+every database scene, instead of TDH top-100 → hash top-10 → verify. It scored +0.47; the honest gain is +2.73.
+The review asked to scale the hidden test (database size, query count or candidate pool) until brute force no
+longer outranks the reference.
+
+**Summary: I could not make brute force lose by scaling. On these data, scaling makes it win by more.**
+- I tested every larger hidden test the released data allow, in one CPU job (`5b8d7c91-23d`).
+- Every enlargement of the database widened brute force's margin.
+- No faithful protocol or weighting change makes brute force lose either.
+- The hidden test, evaluator, data, reference and score files are therefore **unchanged**.
+- Brute force is now closed by an explicit, checkable rule for the post-hoc grader: a per-query budget on detailed
+  matching (below).
+
+Evidence: `redteam/hardening2/`, with these parts:
+- `explore.py` builds the variants with the hidden-test builder's own functions and runs every method on them.
+- `analyze_explore.py` computes ranks and a paired bootstrap; output in `results/explore_analysis.md` and `.json`.
+- `whatif.py` gives weight and normalisation what-ifs; output in `results/whatif_weights.md`.
+- `check_protocol_leak.py` tests the paper-protocol time leak; output in `results/protocol_leak.txt`.
+- `results/metrics/` holds per-variant metrics.
+
+The job reproduces the official hidden-test scores of the reference and both baselines exactly: max difference
+0.0 on all 9 metrics.
+
+### What I tried, and what happened (hidden test, Δrank vs the reference)
+
+Ranks use the gym's coefficients and weights (intra 0.6 / inter 0.4). They are normalised over **panel Q**, the 9
+methods run here: the reference, brute force, verify-all-100-TDH-candidates, the stronger variant, the three paper
+ablations and the two baselines. 95% intervals come from a paired bootstrap over queries.
+
+Variant names:
+- **A** = V-03 queries vs a V-02 database (current direction).
+- **B** = the reverse pair, V-02 queries vs a V-03 database. It is also one of the paper's 12 Venman pairs.
+- **R** = how far past the official test regions the database extends. It adds same-forest scenes never used
+  anywhere else; they are never true matches.
+
+| Hidden-test variant | inter database / queries | Brute force | Stronger (honest) | Paper's "no TDH" ablation |
+|---|---|---:|---:|---:|
+| **Current: Stein + A, R = 15 m** | 543 / 548 | **+0.426** [+0.180, +0.697] | +2.690 | −0.425 |
+| A, R = 35 m | 717 / 548 | +0.508 [+0.263, +0.777] | +2.761 | −0.363 |
+| A, R = 50 m | 882 / 548 | +0.572 [+0.334, +0.850] | +2.838 | −0.290 |
+| A + B, R = 15 m | 543 + 660 / 1013 | +0.565 [+0.337, +0.778] | +2.728 | −0.267 |
+| A + B, R = 35 m | 717 + 966 / 1013 | +0.630 [+0.421, +0.871] | +2.777 | −0.214 |
+| A + B, R = 50 m | 882 + 1198 / 1013 | +0.725 [+0.480, +0.964] | +2.873 | −0.118 |
+| B, R = 50 m | 1198 / 465 | +0.897 [+0.647, +1.185] | +2.905 | **+0.079** |
+| Paper's growing-database intra protocol + A, R = 15 m | 515 intra queries | +0.330 [+0.116, +0.599] | +2.651 | −0.531 |
+
+Why scaling backfires, from the raw metrics (`results/explore.log`):
+- **Brute force is insensitive to the added scenes.** In direction A, brute force's inter R@50 is 0.715 at R = 15,
+  35 and 50 m, and its R@1 moves only from 0.659 to 0.655. The extra scenes never beat its choice. Its false
+  matches (median 54 m away) are structural confusions inside the test regions, not chance hits that a larger pool
+  would multiply.
+- **The reference degrades as the pool grows.** Its R@1 falls 0.799 → 0.786 → 0.774 and its R@50 0.551 → 0.536 →
+  0.524, because the TDH top-100 shortlist gets diluted. Direction B behaves the same way.
+- **The ablation ordering breaks.** At the largest database the paper's own "no TDH" ablation overtakes the
+  reference (+0.079). A test of that size would contradict the paper's Table V.
+- **Brute force's gain is outside the shortlist.** It comes from true matches outside TDH's top 100.
+  Verifying all 100 TDH candidates with the same verifier gains nothing (−0.056 [−0.242, +0.125]).
+- **Its margin sits entirely in intra-session (Stein): +0.42.** There, TDH sometimes misses the right place, and
+  brute force gets the pose right for 22 of the 439 queries where the reference gets neither place nor pose
+  (for 9 of them it also gets the place). No unseen Stein data exist to add, and a larger
+  same-session database helps brute force even more. The release has only Evo, Stein, V-02 and V-03; Evo is the
+  visible train slice.
+
+Other changes I tested and rejected:
+- **The paper's own intra protocol** (database = every frame up to 50 before the query) cuts brute force to
+  +0.33. It also brings the reference to the paper's Stein numbers: R@1 0.876 vs 0.871, R@50 0.922 vs 0.908.
+  But a batch file can only express it as nested chronological databases, and matching scene contents across them
+  reveals time order that pays directly. For 105 of 145 queries of one block, no positive lies in the most recent
+  database block; for 101 of 140 of another, all of them do. Not adopted.
+- **Re-weighting.** Inter-session coefficients that follow the paper's Table II (place recognition), with weights
+  0.5/0.5, bring brute force to −0.03 in panel Q. Normalised over TreeLoc-family attempts only (panel F), it is
+  still +1.82 under the same weights. Brute force has a mixed profile: it is better on Stein and worse on inter
+  R@1/F1/AUC. So its sign depends on the population that future attempts form, not on coefficients. Weights and
+  coefficients are unchanged.
+- **A runtime or CPU budget.** Exhaustive verification over about 1,000 scenes costs about 0.6 ms per pair in the
+  reference's own Python and less when vectorised. That is comparable to the reference's per-query cost, so no
+  budget separates them without failing honest, slower variants. Runtime also varied 1.9× within one earlier job.
+
+### The fix: a per-query search budget, checked by the grader
+
+`scoring/CONSTRAINTS.md`, `scoring/DIRECTION.md` and `briefing/evaluation.md` now bound search per query:
+- **Capped:** detailed matching, meaning any step that estimates a transform or correspondences against a database
+  scene, is allowed against at most 100 scenes per query, independent of database size.
+- **Unrestricted:** cheap whole-database scoring that estimates no transform (global descriptors, hash-key counting,
+  inverted-index voting).
+- **Out of bounds:** exhaustive verification.
+
+This is the paper's real-time design constraint. The paper verifies 10 of its 100 coarse candidates and claims
+< 50 ms per query. Within it, every better method stays expressible: descriptors, voting, verification, confidence
+and pose refinement are all free, and so is verifying all 100 coarse candidates. Verifying all 100 is the most
+search the cap allows; it scores −0.056 [−0.242, +0.125] in panel Q and +0.50 in panel F, so the extra search pays
+only under the narrow family normalisation. The reference, its ablations and the iteration-11 stronger variant
+all comply: the stronger variant verifies 10 candidates and keeps its +2.69.
+
+| Shortcut | Before (iteration 11) | After (iteration 12) |
+|---|---|---|
+| Exhaustive verification (brute force) | +0.470 (11-method panel), +0.426 (this panel); not ruled out | Same hidden-test score, +0.426 [+0.180, +0.697]. Now out of bounds by rule, so the grader rejects it. The test itself cannot stop it (above). |
+
+### Status of the other requirements
+
+- **Do better results score higher? Yes, unchanged.** The stronger variant scores +2.690 [+2.399, +2.949]. Every
+  paper ablation is below the reference:
+  - TDH without DBH: −0.376
+  - no TDH: −0.425
+  - TreeLoc-f: −0.916
+  - no alignment: −4.976
+  - TDH-only baseline: −13.03
+
+  The 9-method panel differs from iteration 11's 11-method panel, so magnitudes differ slightly; the order is
+  identical.
+- **Reference, before and after: unchanged.** Stein: R@1 0.759, R@50 0.879, SR 0.934, TE 0.121 m. Venman: R@1
+  0.799, R@50 0.551. `scoring/scores_test.json` and `scores_train.json` are the iteration-11 files. They were
+  reproduced independently by the review and, for the hidden test, bit-for-bit by this job. No gym code or data
+  changed, so the reference and baselines were not rerun.
+- **Headroom: unchanged.** The reference is at the bound of no scored metric, and the stronger variant is far above
+  it on both experiments. No experiment was added.
+- **Shortcuts left:** iteration 11's list stands (below), now with brute force closed by rule rather than left
+  open: the public answer key, reading `eval/test/` at run time, train-truth tampering, and trading conditional
+  metrics.
+
+### Not fixed, stated plainly
+
+- **The hidden test does not stop exhaustive verification; only the grader rule does.** A submission that verifies
+  every scene still scores about +0.43 if the grader misses it.
+- **The rule cannot be measured by the evaluator.** It relies on the grader reading the method's code.
+- **Scaling with the paper's real data cannot stop it.** Doing so would need distractor databases orders of
+  magnitude larger than the released sessions (about 1,000 scenes each). Brute force's wins are not chance hits
+  among distractors, so adding scenes never hurts it.
+
+---
+
+# Iteration 11 report (unchanged record)
 
 Evidence: `redteam/hardening/` (audit code, submissions, `run_audit.sh`), final results in
 `redteam/hardening/results/` (job `fa409d67-f9e`), the pre-ground-truth-fix run in
